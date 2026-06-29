@@ -190,20 +190,19 @@ def test_mcp_registration():
     tools = asyncio.run(mcp.list_tools())
     tool_names = [t.name for t in tools]
     
-    # Must have all 6 tools registered
     expected_tools = [
         "generate_scad",
         "compile_and_preview",
         "export_stl",
         "export_2d_templates",
         "add_dimensions",
-        "generate_multiview"
+        "generate_multiview",
+        "check_interference"
     ]
     for t in expected_tools:
         assert t in tool_names
 
 def test_documentation_references():
-    # Read instructions.md and verify all 6 tools are mentioned
     with open("instructions.md", "r") as f:
         content = f.read()
         
@@ -213,13 +212,13 @@ def test_documentation_references():
         "export_stl",
         "export_2d_templates",
         "add_dimensions",
-        "generate_multiview"
+        "generate_multiview",
+        "check_interference"
     ]
     for t in expected_tools:
         assert t in content
 
 def test_skill_references():
-    # Read SKILL.md and verify all 6 tools are mentioned
     with open("skills/openscad-mcp/SKILL.md", "r") as f:
         content = f.read()
         
@@ -229,7 +228,8 @@ def test_skill_references():
         "export_stl",
         "export_2d_templates",
         "add_dimensions",
-        "generate_multiview"
+        "generate_multiview",
+        "check_interference"
     ]
     for t in expected_tools:
         assert t in content
@@ -246,7 +246,49 @@ def test_installer(local_tmp_path, monkeypatch):
     
     assert os.path.exists(os.path.join(mock_schema_dir, "generate_scad.json"))
     assert os.path.exists(os.path.join(mock_schema_dir, "export_2d_templates.json"))
+    assert os.path.exists(os.path.join(mock_schema_dir, "check_interference.json"))
     assert os.path.exists(os.path.join(mock_plugin_dir, "plugin.json"))
+
+def test_check_interference_tool(overlapping_scad_file, local_tmp_path):
+    from server import check_interference
+    
+    output_png = os.path.join(local_tmp_path, "col_highlight.png")
+    try:
+        res = check_interference(overlapping_scad_file, fail_fast=False, output_path=output_png, img_size=200)
+        assert len(res) == 3
+        
+        # Check text summary
+        assert "collisions detected" in res[0].text
+        assert "cube_a" in res[0].text
+        
+        # Check image base64
+        assert res[1].type == "image"
+        
+        # Check JSON structured data
+        json_data = json.loads(res[2].text)
+        assert len(json_data) == 1
+        assert json_data[0]["part_a"] == "cube_a"
+        assert json_data[0]["part_b"] == "cube_b"
+        assert json_data[0]["intersection_volume_mm3"] > 0
+        
+        assert os.path.exists(output_png)
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_check_interference_tool_clean(sample_scad_file, local_tmp_path):
+    from server import check_interference
+    
+    output_png = os.path.join(local_tmp_path, "col_highlight_clean.png")
+    try:
+        res = check_interference(sample_scad_file, fail_fast=False, output_path=output_png, img_size=200)
+        assert len(res) == 2  # No image rendered since no collisions
+        assert "no collisions detected" in res[0].text
+        assert res[1].text == "[]" # JSON empty list
+        
+        assert not os.path.exists(output_png)
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
 
 
 

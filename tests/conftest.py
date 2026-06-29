@@ -53,3 +53,37 @@ def sample_scad_file(local_tmp_path, sample_scad_content):
     with open(scad_file, "w") as f:
         f.write(sample_scad_content)
     return scad_file
+
+@pytest.fixture
+def overlapping_scad_file(local_tmp_path):
+    content = """
+    part = "all";
+    
+    module cube_a() {
+        cube([10, 10, 10]);
+    }
+    
+    module cube_b() {
+        translate([5, 0, 0]) cube([10, 10, 10]);
+    }
+    
+    module cube_c() {
+        translate([20, 20, 20]) cube([10, 10, 10]);
+    }
+    
+    if (part == "cube_a") {
+        cube_a();
+    } else if (part == "cube_b") {
+        cube_b();
+    } else if (part == "cube_c") {
+        cube_c();
+    } else {
+        cube_a();
+        cube_b();
+        cube_c();
+    }
+    """
+    scad_path = os.path.join(local_tmp_path, "overlapping.scad")
+    with open(scad_path, "w") as f:
+        f.write(content)
+    return scad_path
