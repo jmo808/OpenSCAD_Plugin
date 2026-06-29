@@ -2,16 +2,16 @@
 
 ## Phase 1: Panel Dimension Extraction
 
-- [~] Task: Write tests for panel dimension extraction
-    - [ ] Create test SCAD fixture with 3-4 parts of known dimensions
-    - [ ] Write test: extracts correct width and height for a rectangular panel
-    - [ ] Write test: extracts dimensions for all parts when no `parts` filter is given
-    - [ ] Write test: extracts dimensions for only specified parts when `parts` filter is provided
-    - [ ] Write test: raises FileNotFoundError for missing SCAD file
-    - [ ] Write test: returns empty list for SCAD file with no part selector
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [b3990bc] Task: Write tests for panel dimension extraction
+    - [x] Create test SCAD fixture with 3-4 parts of known dimensions
+    - [x] Write test: extracts correct width and height for a rectangular panel
+    - [x] Write test: extracts dimensions for all parts when no `parts` filter is given
+    - [x] Write test: extracts dimensions for only specified parts when `parts` filter is provided
+    - [x] Write test: raises FileNotFoundError for missing SCAD file
+    - [x] Write test: returns empty list for SCAD file with no part selector
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement panel dimension extraction
+- [~] Task: Implement panel dimension extraction
     - [ ] Create `nesting.py` module
     - [ ] Implement `extract_panel_dimensions(scad_path: str, parts: list[str] | None) -> list[dict]` that exports each part's 2D projection via OpenSCAD CLI and computes bounding box dimensions
     - [ ] Reuse `discover_parts()` from `scad_utils.py` (created in check_interference track) or implement locally if that track hasn't been completed yet
