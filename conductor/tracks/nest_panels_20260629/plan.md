@@ -2,7 +2,7 @@
 
 ## Phase 1: Panel Dimension Extraction
 
-- [ ] Task: Write tests for panel dimension extraction
+- [~] Task: Write tests for panel dimension extraction
     - [ ] Create test SCAD fixture with 3-4 parts of known dimensions
     - [ ] Write test: extracts correct width and height for a rectangular panel
     - [ ] Write test: extracts dimensions for all parts when no `parts` filter is given
