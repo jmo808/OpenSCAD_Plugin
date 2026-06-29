@@ -97,7 +97,7 @@
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(server): Implement check_interference MCP tool`
 
-- [ ] Task: Update documentation and installer
+- [x] [bcb040f] Task: Update documentation and installer
     - [ ] Update `instructions.md` with `check_interference` tool documentation
     - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
     - [ ] Run `install.py` to verify schema exports correctly
