@@ -30,6 +30,35 @@ Compiles the final OpenSCAD geometry and exports it into a 3D-printable STL file
   - `scad_path` (string): Path to the source `.scad` file.
   - `output_path` (string): Path where the output `.stl` file should be saved.
 
+### 4. `export_2d_templates`
+Selects targeted panels using a top-level `part` variable, rotates them flat to the Z=0 plane using projection, and exports them directly into production-ready DXF and SVG formats.
+- **When to use:** Use this tool to generate 2D patterns for laser cutting, CNC routing, or manual woodworking/machining layout templates.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `output_dir` (string): Output directory where vector files will be saved.
+  - `part_name` (string, optional): Specific part to export. Defaults to 'all', exporting all parts discovered in the model.
+  - `format` (string, default "both"): Vector export format ('dxf', 'svg', or 'both').
+
+### 5. `add_dimensions`
+Injects blueprint-style dimension lines, tick marks, extension lines, and scaling text labels into a 2D panel template, automatically offset in negative coordinates.
+- **When to use:** Use this tool to generate human-readable engineering templates and diagrams for workshop fabrication, with auto-scaling annotations.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `part_name` (string): Name of the part to annotate.
+  - `output_path` (string): Destination path for the dimensioned file (DXF or SVG).
+  - `units` (string, default "mm"): Dimensions units ('mm' or 'inches').
+  - `offset` (number, default 12.0): Distance in mm from the panel boundary to place the dimension lines.
+
+### 6. `generate_multiview`
+Renders a single combined quadrant image containing front, side, top, and isometric views in one MCP call.
+- **When to use:** Use this tool to instantly generate a unified engineering multiview drawing of a 3D model for presentation or design verification.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `output_path` (string): Path where the combined PNG will be saved.
+  - `img_size` (number, default 1024): Resolution of the combined image.
+  - `colorscheme` (string, default "Sunset"): Rendering color scheme.
+  - `views` (array of strings, optional): Custom list of up to 4 views to render. Defaults to ['front', 'right', 'top', 'isometric'].
+
 ## Environment Variables
 - `OPENSCAD_BINARY_PATH`: Path to the OpenSCAD command-line executable. Defaults to `/home/jules/.local/bin/openscad`.
 - `OPENSCAD_DEFAULT_TOLERANCE`: Default design tolerance (for clearances/fits). Defaults to `0.05`.

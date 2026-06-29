@@ -188,6 +188,74 @@ def test_generate_multiview_missing_file():
     with pytest.raises(FileNotFoundError):
         generate_multiview("nonexistent.scad", "out.png")
 
+def test_mcp_registration():
+    from server import mcp
+    import asyncio
+    
+    tools = asyncio.run(mcp.list_tools())
+    tool_names = [t.name for t in tools]
+    
+    # Must have all 6 tools registered
+    expected_tools = [
+        "generate_scad",
+        "compile_and_preview",
+        "export_stl",
+        "export_2d_templates",
+        "add_dimensions",
+        "generate_multiview"
+    ]
+    for t in expected_tools:
+        assert t in tool_names
+
+def test_documentation_references():
+    # Read instructions.md and verify all 6 tools are mentioned
+    with open("instructions.md", "r") as f:
+        content = f.read()
+        
+    expected_tools = [
+        "generate_scad",
+        "compile_and_preview",
+        "export_stl",
+        "export_2d_templates",
+        "add_dimensions",
+        "generate_multiview"
+    ]
+    for t in expected_tools:
+        assert t in content
+
+def test_skill_references():
+    # Read SKILL.md and verify all 6 tools are mentioned
+    with open("skills/openscad-mcp/SKILL.md", "r") as f:
+        content = f.read()
+        
+    expected_tools = [
+        "generate_scad",
+        "compile_and_preview",
+        "export_stl",
+        "export_2d_templates",
+        "add_dimensions",
+        "generate_multiview"
+    ]
+    for t in expected_tools:
+        assert t in content
+
+def test_installer(local_tmp_path, monkeypatch):
+    import install
+    
+    mock_schema_dir = os.path.join(local_tmp_path, "schema")
+    mock_plugin_dir = os.path.join(local_tmp_path, "plugin")
+    
+    monkeypatch.setattr(install, "SCHEMA_DIRS", [mock_schema_dir])
+    monkeypatch.setattr(install, "PLUGIN_DIR", mock_plugin_dir)
+    
+    install.run_install()
+    
+    assert os.path.exists(os.path.join(mock_schema_dir, "generate_scad.json"))
+    assert os.path.exists(os.path.join(mock_schema_dir, "export_2d_templates.json"))
+    assert os.path.exists(os.path.join(mock_plugin_dir, "plugin.json"))
+
+
+
 
 
 
