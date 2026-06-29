@@ -1,6 +1,7 @@
 import os
 import tempfile
 import shutil
+import base64
 from scad_utils import validate_scad_path, run_openscad
 from stl_utils import compute_stl_volume, extract_bounding_box
 
@@ -113,3 +114,109 @@ def run_pairwise_check(scad_path: str, parts: list[str], fail_fast: bool = False
                     return collisions
                     
     return collisions
+
+def generate_highlight_scad(scad_path: str, collisions: list[dict], temp_dir: str) -> str:
+    """Generates the wrapper SCAD code for visual collision highlight."""
+    assembly_stl = os.path.join(temp_dir, "assembly.stl")
+    assembly_stl_esc = assembly_stl.replace("\\", "\\\\")
+    
+    scad_lines = [
+        "// Collision highlight render wrapper",
+        "color([0.7, 0.7, 0.7, 0.25]) {",
+        f'    import("{assembly_stl_esc}");',
+        "}",
+        "color(\"red\") {"
+    ]
+    
+    for c in collisions:
+        part_a = c["part_a"]
+        part_b = c["part_b"]
+        col_stl = os.path.join(temp_dir, f"{part_a}_{part_b}_intersection.stl")
+        col_stl_esc = col_stl.replace("\\", "\\\\")
+        scad_lines.append(f'    import("{col_stl_esc}");')
+        
+    scad_lines.append("}")
+    return "\n".join(scad_lines)
+
+def render_collision_highlight(
+    scad_path: str,
+    collisions: list[dict],
+    output_path: str,
+    img_size: int = 512,
+    colorscheme: str = "Sunset"
+) -> str:
+    """Renders a PNG preview of the assembly with colliding parts highlighted in red."""
+    validate_scad_path(scad_path)
+    
+    if not collisions:
+        return ""
+        
+    base_temp_dir = os.path.expanduser("~/.openscad_temp")
+    os.makedirs(base_temp_dir, exist_ok=True)
+    temp_dir = tempfile.mkdtemp(dir=base_temp_dir, prefix="highlight_")
+    
+    try:
+        # 1. Export full assembly
+        assembly_stl = os.path.join(temp_dir, "assembly.stl")
+        try:
+            run_openscad(["-D", 'part="all"', "-o", assembly_stl, scad_path])
+        except RuntimeError as e:
+            if "Current top level object is empty" in str(e):
+                with open(assembly_stl, "wb") as f:
+                    f.write(b"\x00" * 84)
+            else:
+                raise
+        
+        # 2. Export each collision's intersection STL
+        for c in collisions:
+            part_a = c["part_a"]
+            part_b = c["part_b"]
+            col_stl = os.path.join(temp_dir, f"{part_a}_{part_b}_intersection.stl")
+            
+            part_a_stl = os.path.join(temp_dir, f"{part_a}.stl")
+            part_b_stl = os.path.join(temp_dir, f"{part_b}.stl")
+            
+            run_openscad(["-D", f'part="{part_a}"', "-o", part_a_stl, scad_path])
+            run_openscad(["-D", f'part="{part_b}"', "-o", part_b_stl, scad_path])
+            
+            # Generate wrapper to intersect them
+            wrapper_scad = os.path.join(temp_dir, f"{part_a}_{part_b}_intersection.scad")
+            scad_code = generate_intersection_scad(part_a_stl, part_b_stl)
+            with open(wrapper_scad, "w") as f:
+                f.write(scad_code)
+                
+            run_openscad(["-o", col_stl, wrapper_scad])
+            
+        # 3. Generate highlight wrapper SCAD
+        highlight_scad_path = os.path.join(temp_dir, "highlight.scad")
+        scad_code = generate_highlight_scad(scad_path, collisions, temp_dir)
+        with open(highlight_scad_path, "w") as f:
+            f.write(scad_code)
+            
+        # 4. Render to PNG using OpenSCAD CLI
+        camera_args = "0,0,0,55,0,45,0" # isometric
+        
+        cmd_args = [
+            "-o", output_path,
+            "--imgsize", f"{img_size},{img_size}",
+            "--projection", "o",  # orthogonal
+            "--colorscheme", colorscheme,
+            "--autocenter",
+            "--viewall",
+            f"--camera={camera_args}",
+            highlight_scad_path
+        ]
+        
+        run_openscad(cmd_args)
+        
+        if not os.path.exists(output_path):
+            raise RuntimeError(f"Failed to render collision highlight PNG at: '{output_path}'")
+            
+        # Read and encode to base64
+        with open(output_path, "rb") as f:
+            img_bytes = f.read()
+        return base64.b64encode(img_bytes).decode("utf-8")
+        
+    finally:
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
