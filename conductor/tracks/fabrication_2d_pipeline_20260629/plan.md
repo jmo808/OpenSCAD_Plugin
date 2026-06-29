@@ -66,7 +66,7 @@
 
 - [x] [feb0ef8] Task: Conductor - User Manual Verification 'Phase 3: add_dimensions Tool' (Protocol in workflow.md)
 
-## Phase 4: `generate_multiview` Tool
+## Phase 4: `generate_multiview` Tool [checkpoint: aea504d]
 
 - [x] Task: Write tests for `generate_multiview`
     - [x] Create test SCAD fixture with simple 3D geometry
@@ -87,7 +87,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(multiview): Implement generate_multiview MCP tool`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: generate_multiview Tool' (Protocol in workflow.md)
+- [x] [aea504d] Task: Conductor - User Manual Verification 'Phase 4: generate_multiview Tool' (Protocol in workflow.md)
 
 ## Phase 5: Documentation & Integration
 
