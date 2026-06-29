@@ -81,15 +81,15 @@
  
 ## Phase 4: MCP Tool Integration & Documentation
  
-- [~] Task: Write tests for `extract_bom` MCP tool
-    - [ ] Write test: tool is registered and appears in MCP schema
-    - [ ] Write test: returns structured JSON with aggregated BOM for annotated fixture
-    - [ ] Write test: returns human-readable summary with file paths
-    - [ ] Write test: returns "no annotations found" message for clean SCAD file
-    - [ ] Write test: includes warnings for malformed annotations in response
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [d0f6463] Task: Write tests for `extract_bom` MCP tool
+    - [x] Write test: tool is registered and appears in MCP schema
+    - [x] Write test: returns structured JSON with aggregated BOM for annotated fixture
+    - [x] Write test: returns human-readable summary with file paths
+    - [x] Write test: returns "no annotations found" message for clean SCAD file
+    - [x] Write test: includes warnings for malformed annotations in response
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `extract_bom` MCP tool
+- [~] Task: Implement `extract_bom` MCP tool
     - [ ] Add `@mcp.tool()` decorated `extract_bom` function to `server.py`
     - [ ] Wire up annotation parsing, aggregation, and multi-format export
     - [ ] Build conversational human-readable summary text
