@@ -69,6 +69,26 @@ Detects and reports geometric intersections (collisions) between components in a
   - `colorscheme` (string, default "Sunset"): Rendering color scheme.
   - `output_path` (string, optional): Optional path to save the highlight PNG. Defaults to `<scad_dir>/<scad_basename>_interference.png`.
 
+### 8. `extract_bom`
+Parses tagged hardware annotations embedded in OpenSCAD source files and compiles them into a structured, aggregated Bill of Materials (BOM) exported in JSON, Markdown table, and CSV formats.
+- **When to use:** Use this tool to extract a shopping list or procurement inventory of off-the-shelf components (e.g. fasteners, bearings, connectors) directly from the SCAD design file.
+- **Annotation Formats:**
+  - **Inline comment annotations:** `// BOM: Part Name, qty=N, category=Cat[, supplier=Sup, part_number=PN]`
+  - **Module-level metadata blocks:**
+    ```
+    /* BOM:
+     *   name: Part Name
+     *   qty: N
+     *   category: Cat
+     *   supplier: Sup
+     *   part_number: PN
+     */
+    ```
+- **Parameters:**
+  - `scad_path` (string): Path to the OpenSCAD source file to parse.
+  - `output_dir` (string, optional): Directory where the output files (`bom.json`, `bom.md`, `bom.csv`) will be saved. Defaults to `~/.openscad_bom/`.
+  - `formats` (array of strings, optional): Which formats to export. Defaults to `["json", "md", "csv"]`.
+
 ## Environment Variables
 - `OPENSCAD_BINARY_PATH`: Path to the OpenSCAD command-line executable. Defaults to `/home/jules/.local/bin/openscad`.
 - `OPENSCAD_DEFAULT_TOLERANCE`: Default design tolerance (for clearances/fits). Defaults to `0.05`.
