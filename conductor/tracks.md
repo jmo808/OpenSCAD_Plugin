@@ -7,8 +7,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 
 
-- [~] **Track: Implement BOM extraction and hardware shopping list tool (extract_bom)**
-  *Link: [./tracks/extract_bom_20260629/](./tracks/extract_bom_20260629/)*
+- [x] **Track: Implement BOM extraction and hardware shopping list tool (extract_bom)**
+  *Link: [./archive/extract_bom_20260629/](./archive/extract_bom_20260629/)*
 
 ---
 
