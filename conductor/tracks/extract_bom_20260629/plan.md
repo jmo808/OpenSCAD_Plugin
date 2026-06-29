@@ -1,6 +1,6 @@
 # Implementation Plan: BOM Extraction & Hardware Shopping List Tool
 
-## Phase 1: BOM Annotation Parser
+## Phase 1: BOM Annotation Parser [checkpoint: 6a40903]
 
 - [x] [e43c0a7] Task: Write tests for inline comment BOM parser
     - [x] Create test SCAD fixture with multiple `// BOM:` annotations (varying fields, categories)
@@ -36,11 +36,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(bom): Implement module-level metadata block parser`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: BOM Annotation Parser' (Protocol in workflow.md)
+- [x] [6a40903] Task: Conductor - User Manual Verification 'Phase 1: BOM Annotation Parser' (Protocol in workflow.md)
 
 ## Phase 2: Aggregation & Grouping Engine
 
-- [ ] Task: Write tests for BOM aggregation and grouping
+- [~] Task: Write tests for BOM aggregation and grouping
     - [ ] Write test: aggregates identical items (same name + category) and sums quantities
     - [ ] Write test: case-insensitive name matching ("M3x12 Screw" == "m3x12 screw")
     - [ ] Write test: groups entries by category
