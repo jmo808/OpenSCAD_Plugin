@@ -12,7 +12,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement panel nesting and sheet layout optimization tool (nest_panels)**
+- [~] **Track: Implement panel nesting and sheet layout optimization tool (nest_panels)**
   *Link: [./tracks/nest_panels_20260629/](./tracks/nest_panels_20260629/)*
 
 ---
