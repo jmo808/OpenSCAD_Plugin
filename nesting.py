@@ -171,3 +171,147 @@ def pack_shelf(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) 
         
     return sheets
 
+def pack_ffd(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]:
+    """Packs panels onto sheets using an optimized First-Fit Decreasing (FFD) algorithm with 90° rotation.
+    
+    Sorts panels by area descending. For each panel, finds the first available 
+    corner position on any existing sheet (or creates a new sheet) where it fits, 
+    trying both original and rotated orientations.
+    """
+    if not panels:
+        return []
+        
+    # Sort panels by area descending
+    sorted_panels = sorted(panels, key=lambda p: p["width_mm"] * p["height_mm"], reverse=True)
+    
+    sheets = []
+    
+    for panel in sorted_panels:
+        w = panel["width_mm"]
+        h = panel["height_mm"]
+        name = panel["part_name"]
+        
+        # Check if panel can fit at all (original or rotated)
+        can_fit_orig = (w + 2 * kerf <= sheet_w) and (h + 2 * kerf <= sheet_h)
+        can_fit_rot = (h + 2 * kerf <= sheet_w) and (w + 2 * kerf <= sheet_h)
+        if not (can_fit_orig or can_fit_rot):
+            raise ValueError(f"Panel '{name}' ({w}x{h}) is too large for sheet ({sheet_w}x{sheet_h}) with kerf {kerf}")
+            
+        placed = False
+        
+        # Try to place on existing sheets
+        for sheet in sheets:
+            # Sort candidates by y then x
+            sheet["candidates"] = sorted(sheet["candidates"], key=lambda pt: (pt[1], pt[0]))
+            
+            placement_found = None
+            for cx, cy in sheet["candidates"]:
+                # Try original then rotated orientation
+                orientations = [(w, h, False)]
+                if w != h:
+                    orientations.append((h, w, True))
+                    
+                for pw, ph, rotated in orientations:
+                    if cx + pw + kerf <= sheet_w and cy + ph + kerf <= sheet_h:
+                        # Check overlap
+                        overlaps = False
+                        for p in sheet["panels"]:
+                            px, py = p["x"], p["y"]
+                            pw_p, ph_p = p["width"], p["height"]
+                            if not (cx + pw + kerf <= px or cx >= px + pw_p + kerf or
+                                    cy + ph + kerf <= py or cy >= py + ph_p + kerf):
+                                overlaps = True
+                                break
+                        if not overlaps:
+                            placement_found = (cx, cy, pw, ph, rotated)
+                            break
+                if placement_found:
+                    break
+                    
+            if placement_found:
+                cx, cy, pw, ph, rotated = placement_found
+                # Place the panel
+                sheet["panels"].append({
+                    "part_name": name,
+                    "x": round(cx, 2),
+                    "y": round(cy, 2),
+                    "width": pw,
+                    "height": ph,
+                    "rotated": rotated
+                })
+                # Update candidates
+                sheet["candidates"].remove((cx, cy))
+                sheet["candidates"].append((cx + pw + kerf, cy))
+                sheet["candidates"].append((cx, cy + ph + kerf))
+                
+                # Filter candidates: remove duplicates, out-of-bounds, and covered ones
+                filtered_candidates = []
+                for tx, ty in sheet["candidates"]:
+                    if tx + kerf > sheet_w or ty + kerf > sheet_h:
+                        continue
+                    # Check if inside any placed panel
+                    covered = False
+                    for p in sheet["panels"]:
+                        px, py = p["x"], p["y"]
+                        pw_p, ph_p = p["width"], p["height"]
+                        if px <= tx < px + pw_p + kerf - 1e-5 and py <= ty < py + ph_p + kerf - 1e-5:
+                            covered = True
+                            break
+                    if not covered:
+                        filtered_candidates.append((tx, ty))
+                # Unique
+                sheet["candidates"] = list(dict.fromkeys(filtered_candidates))
+                placed = True
+                break
+                
+        if not placed:
+            # Create a new sheet
+            new_sheet_number = len(sheets) + 1
+            
+            # Try original first, fallback to rotated if it doesn't fit originally
+            pw, ph, rotated = w, h, False
+            if w + 2 * kerf > sheet_w or h + 2 * kerf > sheet_h:
+                pw, ph, rotated = h, w, True
+                
+            new_sheet_panels = [{
+                "part_name": name,
+                "x": round(kerf, 2),
+                "y": round(kerf, 2),
+                "width": pw,
+                "height": ph,
+                "rotated": rotated
+            }]
+            
+            # Initial candidates
+            new_candidates = [
+                (kerf + pw + kerf, kerf),
+                (kerf, kerf + ph + kerf)
+            ]
+            # Filter candidates
+            filtered_candidates = []
+            for tx, ty in new_candidates:
+                if tx + kerf <= sheet_w and ty + kerf <= sheet_h:
+                    filtered_candidates.append((tx, ty))
+                    
+            sheets.append({
+                "sheet_number": new_sheet_number,
+                "sheet_width_mm": sheet_w,
+                "sheet_height_mm": sheet_h,
+                "panels": new_sheet_panels,
+                "candidates": list(dict.fromkeys(filtered_candidates)),
+                "utilization_percent": 0.0,
+                "waste_area_mm2": 0.0
+            })
+            
+    # Calculate final utilization and waste for all sheets
+    sheet_area = sheet_w * sheet_h
+    for sheet in sheets:
+        placed_area = sum(p["width"] * p["height"] for p in sheet["panels"])
+        sheet["utilization_percent"] = round((placed_area / sheet_area) * 100.0, 2)
+        sheet["waste_area_mm2"] = round(sheet_area - placed_area, 2)
+        # Remove candidate tracking info before returning to user
+        if "candidates" in sheet:
+            del sheet["candidates"]
+            
+    return sheets
+
