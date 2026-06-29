@@ -55,3 +55,32 @@ def test_export_stl(sample_scad_file, local_tmp_path):
 def test_export_stl_missing_file():
     with pytest.raises(FileNotFoundError):
         export_stl("nonexistent_file.scad", "output.stl")
+
+def test_validate_scad_path(sample_scad_file):
+    from server import validate_scad_path
+    path = validate_scad_path(sample_scad_file)
+    assert path == sample_scad_file
+    
+    with pytest.raises(FileNotFoundError):
+        validate_scad_path("nonexistent.scad")
+
+def test_run_openscad(sample_scad_file, local_tmp_path):
+    from server import run_openscad
+    import subprocess
+    output_path = os.path.join(local_tmp_path, "output.stl")
+    
+    try:
+        proc = run_openscad(["-o", output_path, sample_scad_file])
+        assert isinstance(proc, subprocess.CompletedProcess)
+        assert proc.returncode == 0
+        assert os.path.exists(output_path)
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+    # test failing command
+    try:
+        with pytest.raises(subprocess.CalledProcessError):
+            run_openscad(["-o", output_path, "nonexistent.scad"])
+    except FileNotFoundError:
+        pass
+

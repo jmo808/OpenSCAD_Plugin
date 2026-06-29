@@ -28,6 +28,18 @@ def get_openscad_binary() -> str:
         "Please install OpenSCAD or configure the OPENSCAD_BINARY_PATH environment variable."
     )
 
+def validate_scad_path(path: str) -> str:
+    """Validates that the file path exists and returns its absolute path."""
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"OpenSCAD file not found at: '{path}'")
+    return os.path.abspath(path)
+
+def run_openscad(args: list) -> subprocess.CompletedProcess:
+    """Executes the OpenSCAD binary with the given arguments."""
+    openscad_bin = get_openscad_binary()
+    cmd = [openscad_bin] + args
+    return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+
 @mcp.tool()
 def generate_scad(scad_code: str, output_path: str, parameters: dict = None) -> str:
     """Writes or modifies an OpenSCAD (.scad) source code file, incorporating mechanical parameters.
@@ -105,10 +117,7 @@ def compile_and_preview(
     Returns:
         A list containing a text explanation and the base64-encoded Image content parts.
     """
-    if not os.path.exists(scad_path):
-        raise FileNotFoundError(f"OpenSCAD file not found at: '{scad_path}'")
-        
-    openscad_bin = get_openscad_binary()
+    validate_scad_path(scad_path)
 
     if not output_dir:
         output_dir = os.path.expanduser("~/.openscad_previews")
@@ -144,9 +153,8 @@ def compile_and_preview(
         preview_filename = f"{scad_basename}_{view_lower}.png"
         preview_path = os.path.join(output_dir, preview_filename)
         
-        # Build command args
-        cmd = [
-            openscad_bin,
+        # Build command args (excluding binary path since run_openscad prepends it)
+        cmd_args = [
             "-o", preview_path,
             "--imgsize", f"{img_size},{img_size}",
             "--projection", projection_flag,
@@ -158,7 +166,7 @@ def compile_and_preview(
         ]
         
         try:
-            process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+            process = run_openscad(cmd_args)
             if os.path.exists(preview_path):
                 with open(preview_path, "rb") as f:
                     img_bytes = f.read()
@@ -189,23 +197,19 @@ def export_stl(scad_path: str, output_path: str) -> str:
     Returns:
         A success message with the file location and size details.
     """
-    if not os.path.exists(scad_path):
-        raise FileNotFoundError(f"OpenSCAD file not found at: '{scad_path}'")
-        
-    openscad_bin = get_openscad_binary()
+    validate_scad_path(scad_path)
 
     # Ensure parent directory of the output file exists
     parent_dir = os.path.dirname(os.path.abspath(output_path))
     os.makedirs(parent_dir, exist_ok=True)
 
-    cmd = [
-        openscad_bin,
+    cmd_args = [
         "-o", output_path,
         scad_path
     ]
 
     try:
-        process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        process = run_openscad(cmd_args)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"OpenSCAD export failed:\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}")
 
