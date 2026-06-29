@@ -1,0 +1,115 @@
+import os
+import pytest
+import tempfile
+import shutil
+
+try:
+    from interference import (
+        generate_intersection_scad,
+        check_pair,
+        run_pairwise_check
+    )
+except ImportError:
+    generate_intersection_scad = None
+    check_pair = None
+    run_pairwise_check = None
+
+# Fixture for overlapping SCAD file
+@pytest.fixture
+def overlapping_scad_file(local_tmp_path):
+    content = """
+    part = "all";
+    
+    module cube_a() {
+        cube([10, 10, 10]);
+    }
+    
+    module cube_b() {
+        translate([5, 0, 0]) cube([10, 10, 10]);
+    }
+    
+    module cube_c() {
+        translate([20, 20, 20]) cube([10, 10, 10]);
+    }
+    
+    if (part == "cube_a") {
+        cube_a();
+    } else if (part == "cube_b") {
+        cube_b();
+    } else if (part == "cube_c") {
+        cube_c();
+    } else {
+        cube_a();
+        cube_b();
+        cube_c();
+    }
+    """
+    scad_path = os.path.join(local_tmp_path, "overlapping.scad")
+    with open(scad_path, "w") as f:
+        f.write(content)
+    return scad_path
+
+def test_imports():
+    assert generate_intersection_scad is not None
+    assert check_pair is not None
+    assert run_pairwise_check is not None
+
+def test_generate_intersection_scad(overlapping_scad_file):
+    scad_code = generate_intersection_scad(overlapping_scad_file, "cube_a", "cube_b")
+    # Verify wrapper code structure
+    assert 'intersection()' in scad_code
+    assert 'part = "cube_a";' in scad_code or 'part="cube_a"' in scad_code
+    assert 'cube_a()' in scad_code or 'include <' in scad_code
+
+def test_check_pair_overlapping(overlapping_scad_file):
+    # cube_a (10x10x10) and cube_b (10x10x10 at [5,0,0]) overlap by 5x10x10 = 500 mm3
+    try:
+        res = check_pair(overlapping_scad_file, "cube_a", "cube_b")
+        assert res is not None
+        assert res["part_a"] == "cube_a"
+        assert res["part_b"] == "cube_b"
+        assert abs(res["intersection_volume_mm3"] - 500.0) < 1.0
+        
+        bbox = res["bounding_box"]
+        assert abs(bbox["x_min"] - 5.0) < 0.1
+        assert abs(bbox["x_max"] - 10.0) < 0.1
+        assert abs(bbox["y_min"] - 0.0) < 0.1
+        assert abs(bbox["y_max"] - 10.0) < 0.1
+        assert abs(bbox["z_min"] - 0.0) < 0.1
+        assert abs(bbox["z_max"] - 10.0) < 0.1
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found")
+
+def test_check_pair_non_overlapping(overlapping_scad_file):
+    # cube_a and cube_c (at [20,20,20]) do not overlap
+    try:
+        res = check_pair(overlapping_scad_file, "cube_a", "cube_c")
+        assert res is None
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found")
+
+def test_run_pairwise_check_all(overlapping_scad_file):
+    # cube_a vs cube_b (collides)
+    # cube_a vs cube_c (clean)
+    # cube_b vs cube_c (clean)
+    try:
+        parts = ["cube_a", "cube_b", "cube_c"]
+        collisions = run_pairwise_check(overlapping_scad_file, parts, fail_fast=False)
+        assert len(collisions) == 1
+        assert collisions[0]["part_a"] == "cube_a"
+        assert collisions[0]["part_b"] == "cube_b"
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found")
+
+def test_run_pairwise_check_fail_fast(overlapping_scad_file):
+    # We should stop at first collision
+    try:
+        parts = ["cube_a", "cube_b", "cube_c"]
+        collisions = run_pairwise_check(overlapping_scad_file, parts, fail_fast=True)
+        assert len(collisions) == 1
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found")
+
+def test_missing_file():
+    with pytest.raises(FileNotFoundError):
+        check_pair("nonexistent.scad", "cube_a", "cube_b")
