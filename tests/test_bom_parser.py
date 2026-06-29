@@ -235,4 +235,95 @@ def test_aggregate_bom():
     assert summary["total_unique_items"] == 3
     assert summary["total_quantity"] == 15
 
+# Import exporters for testing
+import json
+import csv
+from bom_parser import (
+    export_bom_json,
+    export_bom_markdown,
+    export_bom_csv,
+    export_bom
+)
+
+def test_exporters(temp_dir):
+    aggregated = {
+        "categories": {
+            "fastener": [
+                {"name": "M3 Nut", "qty": 6, "category": "fastener"},
+                {"name": "M3x12 Screw", "qty": 7, "category": "fastener", "supplier": "McMaster", "part_number": "91292A111"}
+            ],
+            "electronic": [
+                {"name": "5mm LED", "qty": 2, "category": "electronic", "supplier": "Adafruit", "part_number": "307"}
+            ]
+        },
+        "summary": {
+            "total_unique_items": 3,
+            "total_quantity": 15
+        }
+    }
+    
+    json_path = os.path.join(temp_dir, "bom.json")
+    md_path = os.path.join(temp_dir, "bom.md")
+    csv_path = os.path.join(temp_dir, "bom.csv")
+    
+    # 1. Test JSON export
+    export_bom_json(aggregated, json_path)
+    assert os.path.exists(json_path)
+    with open(json_path, "r") as f:
+        data = json.load(f)
+    assert data["summary"]["total_unique_items"] == 3
+    assert data["categories"]["fastener"][1]["name"] == "M3x12 Screw"
+    
+    # 2. Test MD export
+    export_bom_markdown(aggregated, md_path)
+    assert os.path.exists(md_path)
+    with open(md_path, "r") as f:
+        md_content = f.read()
+    assert "# Bill of Materials" in md_content
+    assert "## fastener" in md_content or "## Fastener" in md_content
+    assert "| M3 Nut | 6 |" in md_content or "| M3 Nut | 6" in md_content
+    assert "| M3x12 Screw | 7 | McMaster | 91292A111 |" in md_content or "91292A111" in md_content
+    
+    # 3. Test CSV export
+    export_bom_csv(aggregated, csv_path)
+    assert os.path.exists(csv_path)
+    with open(csv_path, "r", newline="") as f:
+        reader = csv.reader(f)
+        rows = list(reader)
+    # Headers: category,name,qty,supplier,part_number
+    assert rows[0] == ["category", "name", "qty", "supplier", "part_number"]
+    assert rows[1] == ["electronic", "5mm LED", "2", "Adafruit", "307"]
+    assert rows[2] == ["fastener", "M3 Nut", "6", "", ""]
+    assert rows[3] == ["fastener", "M3x12 Screw", "7", "McMaster", "91292A111"]
+
+def test_unified_export(temp_dir):
+    aggregated = {
+        "categories": {
+            "fastener": [
+                {"name": "M3 Nut", "qty": 6, "category": "fastener"}
+            ]
+        },
+        "summary": {
+            "total_unique_items": 1,
+            "total_quantity": 6
+        }
+    }
+    
+    out_dir = os.path.join(temp_dir, "nested_dir")
+    
+    # Test all formats
+    paths = export_bom(aggregated, out_dir, formats=["json", "md", "csv"])
+    assert set(paths.keys()) == {"json", "md", "csv"}
+    assert os.path.exists(os.path.join(out_dir, "bom.json"))
+    assert os.path.exists(os.path.join(out_dir, "bom.md"))
+    assert os.path.exists(os.path.join(out_dir, "bom.csv"))
+    
+    # Test subset of formats
+    shutil.rmtree(out_dir)
+    paths = export_bom(aggregated, out_dir, formats=["json"])
+    assert set(paths.keys()) == {"json"}
+    assert os.path.exists(os.path.join(out_dir, "bom.json"))
+    assert not os.path.exists(os.path.join(out_dir, "bom.md"))
+
+
 
