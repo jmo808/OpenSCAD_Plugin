@@ -70,14 +70,14 @@
     - [x] Write test: only requested formats are exported when `formats` parameter is specified
     - [x] Run tests and confirm they all fail (Red phase)
  
-- [~] Task: Implement multi-format BOM export
-    - [ ] Add `export_bom_json(aggregated: dict, output_path: str)` function
-    - [ ] Add `export_bom_markdown(aggregated: dict, output_path: str)` function with category headers and table formatting
-    - [ ] Add `export_bom_csv(aggregated: dict, output_path: str)` function using `csv.writer`
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(bom): Implement JSON, Markdown, and CSV export formats`
-
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Multi-Format Export' (Protocol in workflow.md)
+- [x] [408e190] Task: Implement multi-format BOM export
+    - [x] Add `export_bom_json(aggregated: dict, output_path: str)` function
+    - [x] Add `export_bom_markdown(aggregated: dict, output_path: str)` function with category headers and table formatting
+    - [x] Add `export_bom_csv(aggregated: dict, output_path: str)` function using `csv.writer`
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(bom): Implement JSON, Markdown, and CSV export formats`
+ 
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Multi-Format Export' (Protocol in workflow.md)
 
 ## Phase 4: MCP Tool Integration & Documentation
 
