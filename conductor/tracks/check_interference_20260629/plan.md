@@ -2,7 +2,7 @@
 
 ## Phase 1: STL Volume Parser & Shared Utilities
 
-- [ ] Task: Write tests for STL volume calculation utility
+- [x] [e8ce1df] Task: Write tests for STL volume calculation utility
     - [ ] Create a test STL file with known volume (e.g., unit cube = 1000 mm³)
     - [ ] Write test: correctly computes volume of a unit cube STL
     - [ ] Write test: correctly computes volume of a complex mesh (e.g., sphere approximation)
