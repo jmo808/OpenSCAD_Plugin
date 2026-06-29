@@ -12,16 +12,16 @@
     - [x] Write test: returns empty list for SCAD file with no BOM annotations
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement inline comment BOM parser
-    - [ ] Create `bom_parser.py` module
-    - [ ] Implement `parse_inline_bom(scad_path: str) -> list[dict]` using regex to match `// BOM:` lines
-    - [ ] Parse comma-separated key=value pairs after the `// BOM:` prefix
-    - [ ] Handle required vs optional fields with validation
-    - [ ] Collect warnings for malformed lines (store line number + raw text)
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(bom): Implement inline comment BOM annotation parser`
+- [x] [1c2c92f] Task: Implement inline comment BOM parser
+    - [x] Create `bom_parser.py` module
+    - [x] Implement `parse_inline_bom(scad_path: str) -> list[dict]` using regex to match `// BOM:` lines
+    - [x] Parse comma-separated key=value pairs after the `// BOM:` prefix
+    - [x] Handle required vs optional fields with validation
+    - [x] Collect warnings for malformed lines (store line number + raw text)
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(bom): Implement inline comment BOM annotation parser`
 
-- [ ] Task: Write tests for module-level metadata block parser
+- [~] Task: Write tests for module-level metadata block parser
     - [ ] Create test SCAD fixture with `/* BOM: ... */` blocks above module definitions
     - [ ] Write test: parses a single multi-line BOM metadata block
     - [ ] Write test: parses multiple BOM blocks in the same file
