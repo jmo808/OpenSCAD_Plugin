@@ -68,24 +68,24 @@
 
 ## Phase 4: `generate_multiview` Tool
 
-- [ ] Task: Write tests for `generate_multiview`
-    - [ ] Create test SCAD fixture with simple 3D geometry
-    - [ ] Write test: generates a combined PNG with 4 quadrants
-    - [ ] Write test: output image dimensions are correct (img_size x img_size)
-    - [ ] Write test: returns inline base64 image in MCP response
-    - [ ] Write test: returns human-readable summary listing rendered views
-    - [ ] Write test: custom `views` parameter overrides default quadrant layout
-    - [ ] Write test: raises error for missing SCAD file
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] Task: Write tests for `generate_multiview`
+    - [x] Create test SCAD fixture with simple 3D geometry
+    - [x] Write test: generates a combined PNG with 4 quadrants
+    - [x] Write test: output image dimensions are correct (img_size x img_size)
+    - [x] Write test: returns inline base64 image in MCP response
+    - [x] Write test: returns human-readable summary listing rendered views
+    - [x] Write test: custom `views` parameter overrides default quadrant layout
+    - [x] Write test: raises error for missing SCAD file
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `generate_multiview` tool
-    - [ ] Add `Pillow` import and image compositing logic
-    - [ ] Add `@mcp.tool()` decorated `generate_multiview` function to `server.py`
-    - [ ] Render each view individually using existing camera presets via `run_openscad()`
-    - [ ] Composite views into a 2x2 grid using Pillow with separator lines and view labels
-    - [ ] Return the composite image inline (base64) plus file path and summary text
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(multiview): Implement generate_multiview MCP tool`
+- [x] [f8f9ca9] Task: Implement `generate_multiview` tool
+    - [x] Add `Pillow` import and image compositing logic
+    - [x] Add `@mcp.tool()` decorated `generate_multiview` function to `server.py`
+    - [x] Render each view individually using existing camera presets via `run_openscad()`
+    - [x] Composite views into a 2x2 grid using Pillow with separator lines and view labels
+    - [x] Return the composite image inline (base64) plus file path and summary text
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(multiview): Implement generate_multiview MCP tool`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: generate_multiview Tool' (Protocol in workflow.md)
 
