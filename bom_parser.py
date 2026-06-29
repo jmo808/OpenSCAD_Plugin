@@ -186,3 +186,53 @@ def parse_bom_annotations(scad_path: str) -> tuple[list[dict], list[str]]:
     all_warnings.sort(key=warn_key)
     
     return all_entries, all_warnings
+
+def aggregate_bom(entries: list[dict]) -> dict:
+    """Aggregates identical BOM entries and groups them by category.
+    
+    Identical items are matched by name (case-insensitive) and category.
+    Quantities are summed.
+    Groups are sorted alphabetically by name.
+    """
+    aggregated = {}
+    
+    for entry in entries:
+        name = entry["name"]
+        category = entry["category"].lower()
+        key = (name.lower(), category)
+        
+        if key not in aggregated:
+            aggregated[key] = {
+                "name": name,
+                "qty": 0,
+                "category": category
+            }
+            if "supplier" in entry:
+                aggregated[key]["supplier"] = entry["supplier"]
+            if "part_number" in entry:
+                aggregated[key]["part_number"] = entry["part_number"]
+                
+        aggregated[key]["qty"] += entry["qty"]
+        
+    categories = {}
+    total_quantity = 0
+    total_unique_items = len(aggregated)
+    
+    for item in aggregated.values():
+        cat = item["category"]
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(item)
+        total_quantity += item["qty"]
+        
+    for cat in categories:
+        categories[cat].sort(key=lambda x: x["name"].lower())
+        
+    return {
+        "categories": categories,
+        "summary": {
+            "total_unique_items": total_unique_items,
+            "total_quantity": total_quantity
+        }
+    }
+
