@@ -91,23 +91,23 @@
 
 ## Phase 5: Documentation & Integration
 
-- [ ] Task: Write tests for updated installer and schema export
-    - [ ] Write test: `install.py` exports schemas for all 6 tools (3 existing + 3 new)
-    - [ ] Write test: `instructions.md` references all new tools
-    - [ ] Run tests and confirm they fail (Red phase)
+- [x] Task: Write tests for updated installer and schema export
+    - [x] Write test: `install.py` exports schemas for all 6 tools (3 existing + 3 new)
+    - [x] Write test: `instructions.md` references all new tools
+    - [x] Run tests and confirm they fail (Red phase)
 
-- [ ] Task: Update documentation and installer
-    - [ ] Update `instructions.md` with documentation for all three new tools
-    - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool descriptions
-    - [ ] Update `install.py` if needed to handle any new file exports
-    - [ ] Run `install.py` to verify schemas export correctly
-    - [ ] Run tests and confirm they pass (Green phase)
-    - [ ] Commit: `docs(plugin): Update instructions, skill, and installer for new tools`
+- [x] [1727da6] Task: Update documentation and installer
+    - [x] Update `instructions.md` with documentation for all three new tools
+    - [x] Update `skills/openscad-mcp/SKILL.md` to include new tool descriptions
+    - [x] Update `install.py` if needed to handle any new file exports
+    - [x] Run `install.py` to verify schemas export correctly
+    - [x] Run tests and confirm they pass (Green phase)
+    - [x] Commit: `docs(plugin): Update instructions, skill, and installer for new tools`
 
-- [ ] Task: Final coverage verification and cleanup
-    - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
-    - [ ] Fix any coverage gaps by adding targeted tests
-    - [ ] Run full test suite one final time
-    - [ ] Commit: `test(coverage): Ensure >80% coverage for all modules`
+- [x] [1727da6] Task: Final coverage verification and cleanup
+    - [x] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
+    - [x] Fix any coverage gaps by adding targeted tests
+    - [x] Run full test suite one final time
+    - [x] Commit: `test(coverage): Ensure >80% coverage for all modules`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Integration' (Protocol in workflow.md)
