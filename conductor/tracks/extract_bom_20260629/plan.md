@@ -21,15 +21,15 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(bom): Implement inline comment BOM annotation parser`
 
-- [~] Task: Write tests for module-level metadata block parser
-    - [ ] Create test SCAD fixture with `/* BOM: ... */` blocks above module definitions
-    - [ ] Write test: parses a single multi-line BOM metadata block
-    - [ ] Write test: parses multiple BOM blocks in the same file
-    - [ ] Write test: correctly handles mixed inline and block annotations in one file
-    - [ ] Write test: captures correct `source_line` for block annotations
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [326a288] Task: Write tests for module-level metadata block parser
+    - [x] Create test SCAD fixture with `/* BOM: ... */` blocks above module definitions
+    - [x] Write test: parses a single multi-line BOM metadata block
+    - [x] Write test: parses multiple BOM blocks in the same file
+    - [x] Write test: correctly handles mixed inline and block annotations in one file
+    - [x] Write test: captures correct `source_line` for block annotations
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement module-level metadata block parser
+- [~] Task: Implement module-level metadata block parser
     - [ ] Add `parse_block_bom(scad_path: str) -> list[dict]` to `bom_parser.py`
     - [ ] Use regex to match `/* BOM:` ... `*/` blocks with YAML-like `key: value` lines
     - [ ] Implement unified `parse_bom_annotations(scad_path: str) -> tuple[list[dict], list[str]]` that combines both parsers and returns (entries, warnings)
