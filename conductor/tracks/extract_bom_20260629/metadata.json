@@ -1,0 +1,8 @@
+{
+  "track_id": "extract_bom_20260629",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-06-29T18:18:00Z",
+  "updated_at": "2026-06-29T18:18:00Z",
+  "description": "Implement BOM extraction and hardware shopping list tool (extract_bom)"
+}
