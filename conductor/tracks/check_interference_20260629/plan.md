@@ -48,7 +48,7 @@
     - [ ] Write test: raises FileNotFoundError for missing SCAD file
     - [ ] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement interference detection engine
+- [x] [e39a0a7] Task: Implement interference detection engine
     - [ ] Create `interference.py` module with core detection logic
     - [ ] Implement `generate_intersection_scad(scad_path, part_a, part_b) -> str` to generate temporary SCAD code for `intersection() { part_a; part_b; }`
     - [ ] Implement `check_pair(scad_path, part_a, part_b) -> dict | None` that exports intersection to STL and computes volume/bbox
