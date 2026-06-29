@@ -23,16 +23,16 @@
 
 ## Phase 2: Packing Algorithms
 
-- [~] Task: Write tests for shelf packing algorithm (simple)
-    - [ ] Write test: packs 3 rectangles onto a sheet without overlap
-    - [ ] Write test: kerf gaps are applied between panels and from sheet edges
-    - [ ] Write test: starts a new shelf when current shelf is full
-    - [ ] Write test: allocates a second sheet when first sheet overflows
-    - [ ] Write test: all placed panels are within sheet bounds
-    - [ ] Write test: returns correct `utilization_percent` for known layout
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [68ec82e] Task: Write tests for shelf packing algorithm (simple)
+    - [x] Write test: packs 3 rectangles onto a sheet without overlap
+    - [x] Write test: kerf gaps are applied between panels and from sheet edges
+    - [x] Write test: starts a new shelf when current shelf is full
+    - [x] Write test: allocates a second sheet when first sheet overflows
+    - [x] Write test: all placed panels are within sheet bounds
+    - [x] Write test: returns correct `utilization_percent` for known layout
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement shelf packing algorithm
+- [~] Task: Implement shelf packing algorithm (simple)
     - [ ] Add `pack_shelf(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
     - [ ] Place panels left-to-right on horizontal shelves with kerf spacing
     - [ ] Track current shelf height, advance to next shelf or next sheet as needed
