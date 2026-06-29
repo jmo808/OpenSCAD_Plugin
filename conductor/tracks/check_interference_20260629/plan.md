@@ -1,6 +1,6 @@
 # Implementation Plan: Collision Detection & Interference Checking Tool
 
-## Phase 1: STL Volume Parser & Shared Utilities
+## Phase 1: STL Volume Parser & Shared Utilities [checkpoint: b3b0eaa]
 
 - [x] [e8ce1df] Task: Write tests for STL volume calculation utility
     - [ ] Create a test STL file with known volume (e.g., unit cube = 1000 mm³)
@@ -32,7 +32,7 @@
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(scad-utils): Implement part name discovery from SCAD files`
 
-- [x] Task: Conductor - User Manual Verification 'Phase 1: STL Volume Parser & Shared Utilities' (Protocol in workflow.md)
+- [x] [b3b0eaa] Task: Conductor - User Manual Verification 'Phase 1: STL Volume Parser & Shared Utilities' (Protocol in workflow.md)
 
 ## Phase 2: Core Interference Detection Logic
 
