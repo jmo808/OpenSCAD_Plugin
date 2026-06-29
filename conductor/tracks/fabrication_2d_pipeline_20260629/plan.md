@@ -89,7 +89,7 @@
 
 - [x] [aea504d] Task: Conductor - User Manual Verification 'Phase 4: generate_multiview Tool' (Protocol in workflow.md)
 
-## Phase 5: Documentation & Integration
+## Phase 5: Documentation & Integration [checkpoint: 341e0b1]
 
 - [x] Task: Write tests for updated installer and schema export
     - [x] Write test: `install.py` exports schemas for all 6 tools (3 existing + 3 new)
@@ -110,4 +110,4 @@
     - [x] Run full test suite one final time
     - [x] Commit: `test(coverage): Ensure >80% coverage for all modules`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Integration' (Protocol in workflow.md)
+- [x] [341e0b1] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Integration' (Protocol in workflow.md)
