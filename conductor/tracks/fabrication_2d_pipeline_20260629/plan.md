@@ -41,7 +41,7 @@
 
 - [x] [82eb332] Task: Conductor - User Manual Verification 'Phase 2: export_2d_templates Tool' (Protocol in workflow.md)
 
-## Phase 3: `add_dimensions` Tool
+## Phase 3: `add_dimensions` Tool [checkpoint: feb0ef8]
 
 - [x] Task: Write tests for `add_dimensions`
     - [x] Create test SCAD fixture with a simple rectangular panel and a panel with cutouts
@@ -64,7 +64,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(dimensions): Implement add_dimensions MCP tool`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: add_dimensions Tool' (Protocol in workflow.md)
+- [x] [feb0ef8] Task: Conductor - User Manual Verification 'Phase 3: add_dimensions Tool' (Protocol in workflow.md)
 
 ## Phase 4: `generate_multiview` Tool
 
