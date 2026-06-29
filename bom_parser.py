@@ -236,3 +236,71 @@ def aggregate_bom(entries: list[dict]) -> dict:
         }
     }
 
+import json
+import csv
+
+def export_bom_json(aggregated: dict, output_path: str):
+    """Exports aggregated BOM to JSON format."""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(aggregated, f, indent=2)
+
+def export_bom_markdown(aggregated: dict, output_path: str):
+    """Exports aggregated BOM to a Markdown table."""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write("# Bill of Materials\n\n")
+        for cat in sorted(aggregated["categories"].keys()):
+            items = aggregated["categories"][cat]
+            f.write(f"## {cat}\n\n")
+            f.write("| Category | Part Name | Qty | Supplier | Part # |\n")
+            f.write("| --- | --- | --- | --- | --- |\n")
+            for item in items:
+                sup = item.get("supplier", "")
+                pnum = item.get("part_number", "")
+                f.write(f"| {cat} | {item['name']} | {item['qty']} | {sup} | {pnum} |\n")
+            f.write("\n")
+
+def export_bom_csv(aggregated: dict, output_path: str):
+    """Exports aggregated BOM to CSV format."""
+    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(["category", "name", "qty", "supplier", "part_number"])
+        for cat in sorted(aggregated["categories"].keys()):
+            items = aggregated["categories"][cat]
+            for item in items:
+                sup = item.get("supplier", "")
+                pnum = item.get("part_number", "")
+                writer.writerow([cat, item["name"], item["qty"], sup, pnum])
+
+
+def export_bom(aggregated: dict, output_dir: str = None, formats: list = None) -> dict[str, str]:
+    """Unified exporter to write BOM in multiple formats to output_dir.
+    
+    Returns:
+        dict mapping format -> absolute file path.
+    """
+    if output_dir is None:
+        output_dir = os.path.expanduser("~/.openscad_bom/")
+        
+    os.makedirs(output_dir, exist_ok=True)
+    
+    if formats is None:
+        formats = ["json", "md", "csv"]
+        
+    paths = {}
+    
+    if "json" in formats:
+        json_path = os.path.abspath(os.path.join(output_dir, "bom.json"))
+        export_bom_json(aggregated, json_path)
+        paths["json"] = json_path
+        
+    if "md" in formats:
+        md_path = os.path.abspath(os.path.join(output_dir, "bom.md"))
+        export_bom_markdown(aggregated, md_path)
+        paths["md"] = md_path
+        
+    if "csv" in formats:
+        csv_path = os.path.abspath(os.path.join(output_dir, "bom.csv"))
+        export_bom_csv(aggregated, csv_path)
+        paths["csv"] = csv_path
+        
+    return paths
