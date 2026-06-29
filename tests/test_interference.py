@@ -3,16 +3,11 @@ import pytest
 import tempfile
 import shutil
 
-try:
-    from interference import (
-        generate_intersection_scad,
-        check_pair,
-        run_pairwise_check
-    )
-except ImportError:
-    generate_intersection_scad = None
-    check_pair = None
-    run_pairwise_check = None
+from interference import (
+    generate_intersection_scad,
+    check_pair,
+    run_pairwise_check
+)
 
 # Fixture for overlapping SCAD file
 @pytest.fixture
@@ -54,12 +49,13 @@ def test_imports():
     assert check_pair is not None
     assert run_pairwise_check is not None
 
-def test_generate_intersection_scad(overlapping_scad_file):
-    scad_code = generate_intersection_scad(overlapping_scad_file, "cube_a", "cube_b")
+def test_generate_intersection_scad():
+    scad_code = generate_intersection_scad("temp_a.stl", "temp_b.stl")
     # Verify wrapper code structure
     assert 'intersection()' in scad_code
-    assert 'part = "cube_a";' in scad_code or 'part="cube_a"' in scad_code
-    assert 'cube_a()' in scad_code or 'include <' in scad_code
+    assert 'import(' in scad_code
+    assert 'temp_a.stl' in scad_code
+    assert 'temp_b.stl' in scad_code
 
 def test_check_pair_overlapping(overlapping_scad_file):
     # cube_a (10x10x10) and cube_b (10x10x10 at [5,0,0]) overlap by 5x10x10 = 500 mm3
