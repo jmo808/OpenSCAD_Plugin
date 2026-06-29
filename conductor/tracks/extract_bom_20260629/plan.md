@@ -79,7 +79,7 @@
   
 - [x] [ebc4863] Task: Conductor - User Manual Verification 'Phase 3: Multi-Format Export' (Protocol in workflow.md)
  
-## Phase 4: MCP Tool Integration & Documentation
+## Phase 4: MCP Tool Integration & Documentation [checkpoint: 38d3a85]
  
 - [x] [d0f6463] Task: Write tests for `extract_bom` MCP tool
     - [x] Write test: tool is registered and appears in MCP schema
@@ -110,4 +110,4 @@
     - [x] Run full test suite one final time
     - [x] Commit: `test(coverage): Ensure >80% coverage for BOM module`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
+- [x] [38d3a85] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
