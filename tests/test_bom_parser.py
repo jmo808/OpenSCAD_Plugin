@@ -186,3 +186,53 @@ def test_parse_bom_annotations_mixed(temp_dir):
     assert entries[1]["name"] == "M3 hex nut"
     assert "line 11" in warnings[0].lower()
 
+# Import aggregation function for testing
+from bom_parser import aggregate_bom
+
+def test_aggregate_bom():
+    entries = [
+        {"name": "M3x12 Screw", "qty": 4, "category": "fastener", "supplier": "McMaster", "part_number": "91292A111", "source_line": 1},
+        {"name": "m3x12 screw", "qty": 2, "category": "Fastener", "supplier": "McMaster", "part_number": "91292A111", "source_line": 2},
+        {"name": "M3 Nut", "qty": 6, "category": "fastener", "source_line": 3},
+        {"name": "M3x12 Screw", "qty": 1, "category": "fastener", "source_line": 4},
+        {"name": "5mm LED", "qty": 2, "category": "electronic", "supplier": "Adafruit", "part_number": "307", "source_line": 5}
+    ]
+    
+    res = aggregate_bom(entries)
+    
+    # Check structure
+    assert "categories" in res
+    assert "summary" in res
+    
+    # Check categories grouping (normalized to lowercase or original lowercase group)
+    # We expect 'fastener' and 'electronic' keys
+    cats = res["categories"]
+    assert len(cats) == 2
+    assert "fastener" in cats
+    assert "electronic" in cats
+    
+    # Check sorting within fastener category: "M3 Nut" then "M3x12 Screw" (sorted alphabetically by name)
+    fasteners = cats["fastener"]
+    assert len(fasteners) == 2
+    assert fasteners[0]["name"] == "M3 Nut"
+    assert fasteners[0]["qty"] == 6
+    
+    # Check aggregation and sum for M3x12 Screw (4 + 2 + 1 = 7)
+    assert fasteners[1]["name"] == "M3x12 Screw"  # preserves casing of first or just uses it
+    assert fasteners[1]["qty"] == 7
+    # Preserves supplier and part_number from first occurrence
+    assert fasteners[1]["supplier"] == "McMaster"
+    assert fasteners[1]["part_number"] == "91292A111"
+    
+    # Check electronic category
+    electronics = cats["electronic"]
+    assert len(electronics) == 1
+    assert electronics[0]["name"] == "5mm LED"
+    assert electronics[0]["qty"] == 2
+    
+    # Check summary
+    summary = res["summary"]
+    assert summary["total_unique_items"] == 3
+    assert summary["total_quantity"] == 15
+
+
