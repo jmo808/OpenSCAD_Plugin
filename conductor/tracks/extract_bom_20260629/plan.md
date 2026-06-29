@@ -98,16 +98,16 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(server): Implement extract_bom MCP tool`
 
-- [~] Task: Update documentation and installer
-    - [ ] Update `instructions.md` with `extract_bom` tool documentation and annotation format guide
-    - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
-    - [ ] Run `install.py` to verify schema exports correctly
-    - [ ] Commit: `docs(plugin): Add extract_bom to instructions and skill`
+- [x] [4d6e641] Task: Update documentation and installer
+    - [x] Update `instructions.md` with `extract_bom` tool documentation and annotation format guide
+    - [x] Update `skills/openscad-mcp/SKILL.md` to include new tool description
+    - [x] Run `install.py` to verify schema exports correctly
+    - [x] Commit: `docs(plugin): Add extract_bom to instructions and skill`
 
-- [ ] Task: Final coverage verification
-    - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
-    - [ ] Fix any coverage gaps with targeted tests
-    - [ ] Run full test suite one final time
-    - [ ] Commit: `test(coverage): Ensure >80% coverage for BOM module`
+- [x] Task: Final coverage verification
+    - [x] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
+    - [x] Fix any coverage gaps with targeted tests
+    - [x] Run full test suite one final time
+    - [x] Commit: `test(coverage): Ensure >80% coverage for BOM module`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
