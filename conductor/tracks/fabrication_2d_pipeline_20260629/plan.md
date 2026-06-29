@@ -2,11 +2,11 @@
 
 ## Phase 1: Foundation & Project Setup
 
-- [ ] Task: Set up testing infrastructure and project dependencies
-    - [ ] Add `pytest-cov` and `Pillow` to `pyproject.toml` dependencies
-    - [ ] Create `tests/` directory with `conftest.py` and shared fixtures (temp dirs, sample SCAD files)
-    - [ ] Verify `pytest --cov=. --cov-report=term` runs cleanly against existing code
-    - [ ] Commit: `chore(setup): Add testing infrastructure and Pillow dependency`
+- [x] [65e2025] Task: Set up testing infrastructure and project dependencies
+    - [x] Add `pytest-cov` and `Pillow` to `pyproject.toml` dependencies
+    - [x] Create `tests/` directory with `conftest.py` and shared fixtures (temp dirs, sample SCAD files)
+    - [x] Verify `pytest --cov=. --cov-report=term` runs cleanly against existing code
+    - [x] Commit: `chore(setup): Add testing infrastructure and Pillow dependency`
 
 - [ ] Task: Refactor `server.py` to extract shared utilities
     - [ ] Write tests for `get_openscad_binary()` and a new `run_openscad()` helper
