@@ -43,26 +43,26 @@
 
 ## Phase 3: `add_dimensions` Tool
 
-- [ ] Task: Write tests for `add_dimensions`
-    - [ ] Create test SCAD fixture with a simple rectangular panel and a panel with cutouts
-    - [ ] Write test: dimension lines are placed at negative X/Y coordinates (outside panel outline)
-    - [ ] Write test: output file is generated at specified path in DXF format
-    - [ ] Write test: output file is generated at specified path in SVG format
-    - [ ] Write test: font size scales dynamically based on panel dimensions
-    - [ ] Write test: `units="inches"` produces inch-formatted labels
-    - [ ] Write test: custom `offset` parameter controls dimension line placement distance
-    - [ ] Write test: raises error for missing SCAD file
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] Task: Write tests for `add_dimensions`
+    - [x] Create test SCAD fixture with a simple rectangular panel and a panel with cutouts
+    - [x] Write test: dimension lines are placed at negative X/Y coordinates (outside panel outline)
+    - [x] Write test: output file is generated at specified path in DXF format
+    - [x] Write test: output file is generated at specified path in SVG format
+    - [x] Write test: font size scales dynamically based on panel dimensions
+    - [x] Write test: `units="inches"` produces inch-formatted labels
+    - [x] Write test: custom `offset` parameter controls dimension line placement distance
+    - [x] Write test: raises error for missing SCAD file
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `add_dimensions` tool
-    - [ ] Add `@mcp.tool()` decorated `add_dimensions` function to `server.py`
-    - [ ] Implement dynamic font sizing: `max(3.5, min(6.0, span * 0.04))`
-    - [ ] Implement `draw_dim_x` and `draw_dim_y` OpenSCAD module generation (extension lines, tick marks, text labels)
-    - [ ] Generate wrapper SCAD code that unions the panel projection with dimension annotations
-    - [ ] Invoke OpenSCAD CLI to render the dimensioned 2D output
-    - [ ] Return structured response with file path and dimensions
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(dimensions): Implement add_dimensions MCP tool`
+- [x] [22f9648] Task: Implement `add_dimensions` tool
+    - [x] Add `@mcp.tool()` decorated `add_dimensions` function to `server.py`
+    - [x] Implement dynamic font sizing: `max(3.5, min(6.0, span * 0.04))`
+    - [x] Implement `draw_dim_x` and `draw_dim_y` OpenSCAD module generation (extension lines, tick marks, text labels)
+    - [x] Generate wrapper SCAD code that unions the panel projection with dimension annotations
+    - [x] Invoke OpenSCAD CLI to render the dimensioned 2D output
+    - [x] Return structured response with file path and dimensions
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(dimensions): Implement add_dimensions MCP tool`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: add_dimensions Tool' (Protocol in workflow.md)
 
