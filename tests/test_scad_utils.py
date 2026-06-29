@@ -3,11 +3,7 @@ import pytest
 import tempfile
 import shutil
 
-# Import from scad_utils, which we will implement next.
-try:
-    from scad_utils import discover_parts
-except ImportError:
-    discover_parts = None
+from scad_utils import discover_parts
 
 @pytest.fixture
 def temp_dir():

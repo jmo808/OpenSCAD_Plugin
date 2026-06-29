@@ -6,6 +6,7 @@ import json
 import re
 from PIL import Image as PILImage, ImageDraw as PILImageDraw
 from mcp.server.fastmcp import FastMCP, Image
+from scad_utils import discover_parts
 
 # Initialize the FastMCP server
 mcp = FastMCP("openscad-mcp")
@@ -226,17 +227,7 @@ def export_stl(scad_path: str, output_path: str) -> str:
     
     return f"Successfully exported 3D geometry to STL at '{output_path}' ({size_kb:.2f} KB)."
 
-def discover_parts(scad_path: str) -> list[str]:
-    """Parses the SCAD file to find all part selector names."""
-    with open(scad_path, "r") as f:
-        content = f.read()
-    # Match patterns like: part == "side_panel" or part=="back_panel"
-    matches = re.findall(r'part\s*==\s*["\']([^"\']+)["\']', content)
-    parts = []
-    for m in matches:
-        if m != "all" and m not in parts:
-            parts.append(m)
-    return parts
+
 
 def get_dxf_bounds(dxf_path: str) -> tuple[float, float, float, float]:
     """Parses a DXF file to return (x_min, x_max, y_min, y_max)."""
