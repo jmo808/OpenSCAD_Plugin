@@ -38,7 +38,7 @@
 
 - [x] [6a40903] Task: Conductor - User Manual Verification 'Phase 1: BOM Annotation Parser' (Protocol in workflow.md)
 
-## Phase 2: Aggregation & Grouping Engine
+## Phase 2: Aggregation & Grouping Engine [checkpoint: b1e3738]
 
 - [x] [0168959] Task: Write tests for BOM aggregation and grouping
     - [x] Write test: aggregates identical items (same name + category) and sums quantities
@@ -57,11 +57,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(bom): Implement aggregation and category grouping engine`
  
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Aggregation & Grouping Engine' (Protocol in workflow.md)
+- [x] [b1e3738] Task: Conductor - User Manual Verification 'Phase 2: Aggregation & Grouping Engine' (Protocol in workflow.md)
 
 ## Phase 3: Multi-Format Export
 
-- [ ] Task: Write tests for JSON, Markdown, and CSV export
+- [~] Task: Write tests for JSON, Markdown, and CSV export
     - [ ] Write test: JSON output is valid and contains all required fields
     - [ ] Write test: JSON includes `total_unique_items` and `total_quantity` summary
     - [ ] Write test: Markdown output has correct table headers and category group headings
