@@ -197,7 +197,8 @@ def test_mcp_registration():
         "export_2d_templates",
         "add_dimensions",
         "generate_multiview",
-        "check_interference"
+        "check_interference",
+        "extract_bom"
     ]
     for t in expected_tools:
         assert t in tool_names
@@ -213,7 +214,8 @@ def test_documentation_references():
         "export_2d_templates",
         "add_dimensions",
         "generate_multiview",
-        "check_interference"
+        "check_interference",
+        "extract_bom"
     ]
     for t in expected_tools:
         assert t in content
@@ -229,7 +231,8 @@ def test_skill_references():
         "export_2d_templates",
         "add_dimensions",
         "generate_multiview",
-        "check_interference"
+        "check_interference",
+        "extract_bom"
     ]
     for t in expected_tools:
         assert t in content
@@ -247,6 +250,7 @@ def test_installer(local_tmp_path, monkeypatch):
     assert os.path.exists(os.path.join(mock_schema_dir, "generate_scad.json"))
     assert os.path.exists(os.path.join(mock_schema_dir, "export_2d_templates.json"))
     assert os.path.exists(os.path.join(mock_schema_dir, "check_interference.json"))
+    assert os.path.exists(os.path.join(mock_schema_dir, "extract_bom.json"))
     assert os.path.exists(os.path.join(mock_plugin_dir, "plugin.json"))
 
 def test_check_interference_tool(overlapping_scad_file, local_tmp_path):
@@ -288,6 +292,65 @@ def test_check_interference_tool_clean(sample_scad_file, local_tmp_path):
         assert not os.path.exists(output_png)
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not found/available")
+
+def test_extract_bom_tool(local_tmp_path):
+    from server import extract_bom
+    scad_content = """
+    // BOM: M3x12 screw, qty=4, category=fastener
+    /* BOM:
+     *   name: M3 Nut
+     *   qty: 2
+     *   category: fastener
+     */
+    """
+    scad_path = os.path.join(local_tmp_path, "annotated.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    out_dir = os.path.join(local_tmp_path, "bom_out")
+    res = extract_bom(scad_path, output_dir=out_dir)
+    assert len(res) == 2
+    
+    summary = res[0]["text"]
+    assert "Found 2 hardware items" in summary or "found 2 hardware items" in summary.lower()
+    assert "bom.json" in summary
+    assert "bom.md" in summary
+    assert "bom.csv" in summary
+    
+    json_data = json.loads(res[1]["text"])
+    assert json_data["summary"]["total_unique_items"] == 2
+    assert json_data["summary"]["total_quantity"] == 6
+
+def test_extract_bom_tool_clean(local_tmp_path):
+    from server import extract_bom
+    scad_content = """
+    module no_bom() { cube([10, 10, 10]); }
+    """
+    scad_path = os.path.join(local_tmp_path, "clean.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    out_dir = os.path.join(local_tmp_path, "bom_out_clean")
+    res = extract_bom(scad_path, output_dir=out_dir)
+    assert len(res) == 2
+    assert "No BOM annotations found" in res[0]["text"]
+    assert json.loads(res[1]["text"]) == {}
+
+def test_extract_bom_tool_malformed(local_tmp_path):
+    from server import extract_bom
+    scad_content = """
+    // BOM: qty=4, category=fastener
+    // BOM: M3 Nut, qty=2, category=fastener
+    """
+    scad_path = os.path.join(local_tmp_path, "malformed.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    out_dir = os.path.join(local_tmp_path, "bom_out_malformed")
+    res = extract_bom(scad_path, output_dir=out_dir)
+    assert len(res) == 2
+    assert "Found 1 hardware items" in res[0]["text"] or "found 1 hardware items" in res[0]["text"].lower()
+    assert "warning" in res[0]["text"].lower()
 
 
 
