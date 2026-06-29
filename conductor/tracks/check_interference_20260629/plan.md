@@ -32,7 +32,7 @@
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(scad-utils): Implement part name discovery from SCAD files`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: STL Volume Parser & Shared Utilities' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: STL Volume Parser & Shared Utilities' (Protocol in workflow.md)
 
 ## Phase 2: Core Interference Detection Logic
 
