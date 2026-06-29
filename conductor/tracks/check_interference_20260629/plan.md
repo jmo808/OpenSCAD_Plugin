@@ -19,7 +19,7 @@
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(stl-utils): Implement STL volume and bounding box parser`
 
-- [ ] Task: Write tests for SCAD part name discovery utility
+- [x] [e66c4e0] Task: Write tests for SCAD part name discovery utility
     - [ ] Create test SCAD fixture with multiple `if (part == "...")` branches
     - [ ] Write test: discovers all part names from a multi-part SCAD file
     - [ ] Write test: returns empty list for SCAD file with no part selector
