@@ -40,20 +40,19 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement simple shelf packing algorithm`
 
-- [~] Task: Write tests for optimized packing algorithm (FFD with rotation)
-    - [ ] Write test: sorts panels by area descending before packing
-    - [ ] Write test: rotates panels 90° when it yields a better fit
-    - [ ] Write test: achieves equal or better utilization than shelf algorithm for the same input
-    - [ ] Write test: kerf gaps are correctly applied
-    - [ ] Write test: multi-sheet allocation works correctly
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [af50852] Task: Write tests for optimized packing algorithm (FFD with rotation)
+    - [x] Write test: sorts panels by area descending before packing
+    - [x] Write test: rotates panels 90° when it yields a better fit
+    - [x] Write test: achieves equal or better utilization than shelf algorithm for the same input
+    - [x] Write test: kerf gaps are correctly applied
+    - [x] Write test: multi-sheet allocation works correctly
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement FFD packing algorithm
+- [~] Task: Implement FFD packing algorithm
     - [ ] Add `pack_ffd(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
     - [ ] Sort panels by area (largest first)
     - [ ] For each panel, try both orientations and place in first available position
-    - [ ] Use a free-rectangle tracking approach for available space
-    - [ ] Compute utilization percentage per sheet
+    - [ ] Calculate `utilization_percent` and `waste_area_mm2` per sheet
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(nesting): Implement FFD (optimized) packing algorithm`
 
