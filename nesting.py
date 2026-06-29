@@ -63,3 +63,111 @@ def extract_panel_dimensions(scad_path: str, parts: list[str] = None) -> list[di
             shutil.rmtree(tmpdir)
                 
     return results
+
+def pack_shelf(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]:
+    """Packs panels onto sheets using a simple shelf packing algorithm.
+    
+    Places panels left-to-right on horizontal shelves. Starts a new shelf when 
+    the current shelf is full. Starts a new sheet when the current sheet is full.
+    """
+    if not panels:
+        return []
+        
+    sheets = []
+    
+    current_sheet_number = 1
+    current_sheet_panels = []
+    
+    x = kerf
+    y = kerf
+    shelf_height = 0.0
+    
+    for panel in panels:
+        w = panel["width_mm"]
+        h = panel["height_mm"]
+        name = panel["part_name"]
+        
+        # A single panel must fit inside the sheet accounting for kerf margins on all sides
+        if w + 2 * kerf > sheet_w or h + 2 * kerf > sheet_h:
+            raise ValueError(f"Panel '{name}' ({w}x{h}) is too large for sheet ({sheet_w}x{sheet_h}) with kerf {kerf}")
+            
+        # Try to place on the current shelf
+        if x + w + kerf <= sheet_w and y + h + kerf <= sheet_h:
+            current_sheet_panels.append({
+                "part_name": name,
+                "x": round(x, 2),
+                "y": round(y, 2),
+                "width": w,
+                "height": h,
+                "rotated": False
+            })
+            x += w + kerf
+            if h > shelf_height:
+                shelf_height = h
+        else:
+            # Try to start a new shelf on the current sheet
+            new_x = kerf
+            new_y = y + shelf_height + kerf
+            
+            if new_x + w + kerf <= sheet_w and new_y + h + kerf <= sheet_h:
+                x = new_x
+                y = new_y
+                shelf_height = h
+                current_sheet_panels.append({
+                    "part_name": name,
+                    "x": round(x, 2),
+                    "y": round(y, 2),
+                    "width": w,
+                    "height": h,
+                    "rotated": False
+                })
+                x += w + kerf
+            else:
+                # Start a new sheet
+                sheet_area = sheet_w * sheet_h
+                placed_area = sum(p["width"] * p["height"] for p in current_sheet_panels)
+                util = round((placed_area / sheet_area) * 100.0, 2)
+                waste = round(sheet_area - placed_area, 2)
+                
+                sheets.append({
+                    "sheet_number": current_sheet_number,
+                    "sheet_width_mm": sheet_w,
+                    "sheet_height_mm": sheet_h,
+                    "panels": current_sheet_panels,
+                    "utilization_percent": util,
+                    "waste_area_mm2": waste
+                })
+                
+                current_sheet_number += 1
+                current_sheet_panels = []
+                x = kerf
+                y = kerf
+                shelf_height = h
+                
+                current_sheet_panels.append({
+                    "part_name": name,
+                    "x": round(x, 2),
+                    "y": round(y, 2),
+                    "width": w,
+                    "height": h,
+                    "rotated": False
+                })
+                x += w + kerf
+                
+    if current_sheet_panels:
+        sheet_area = sheet_w * sheet_h
+        placed_area = sum(p["width"] * p["height"] for p in current_sheet_panels)
+        util = round((placed_area / sheet_area) * 100.0, 2)
+        waste = round(sheet_area - placed_area, 2)
+        
+        sheets.append({
+            "sheet_number": current_sheet_number,
+            "sheet_width_mm": sheet_w,
+            "sheet_height_mm": sheet_h,
+            "panels": current_sheet_panels,
+            "utilization_percent": util,
+            "waste_area_mm2": waste
+        })
+        
+    return sheets
+
