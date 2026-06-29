@@ -80,7 +80,7 @@
 
 ## Phase 4: MCP Tool Integration & Documentation
 
-- [ ] Task: Write tests for `check_interference` MCP tool
+- [x] [08d5b5e] Task: Write tests for `check_interference` MCP tool
     - [ ] Write test: tool is registered and appears in MCP schema
     - [ ] Write test: returns structured JSON with collision data for overlapping fixture
     - [ ] Write test: returns human-readable summary with file paths
