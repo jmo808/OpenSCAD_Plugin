@@ -88,7 +88,7 @@
     - [ ] Write test: returns clean 'no collisions' message for non-overlapping fixture
     - [ ] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `check_interference` MCP tool
+- [x] [da6beb0] Task: Implement `check_interference` MCP tool
     - [ ] Add `@mcp.tool()` decorated `check_interference` function to `server.py`
     - [ ] Wire up part discovery, pairwise check, and highlight render
     - [ ] Build structured JSON response with collision array
