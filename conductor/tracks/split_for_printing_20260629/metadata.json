@@ -1,0 +1,8 @@
+{
+  "track_id": "split_for_printing_20260629",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-06-29T18:29:00Z",
+  "updated_at": "2026-06-29T18:29:00Z",
+  "description": "Implement part splitting with joining mechanisms for 3D printing (split_for_printing)"
+}

@@ -1,0 +1,146 @@
+# Implementation Plan: Part Splitting with Joining Mechanisms for 3D Printing
+
+## Phase 1: Split Plane Calculation
+
+- [ ] Task: Write tests for bounding box extraction and split plane calculation
+    - [ ] Create test SCAD fixture with a known oversized part (e.g., 300×150×400mm box)
+    - [ ] Write test: extracts correct bounding box dimensions from a part via OpenSCAD CLI
+    - [ ] Write test: auto mode identifies Z as oversize axis for a 400mm tall part on 250mm bed
+    - [ ] Write test: auto mode computes correct split coordinate (midpoint) for single split
+    - [ ] Write test: auto mode computes multiple split coordinates for very large parts (3+ segments)
+    - [ ] Write test: auto mode identifies multiple oversize axes and splits each
+    - [ ] Write test: manual mode uses user-specified axis and coordinate
+    - [ ] Write test: safety margin (5mm) is subtracted from bed dimensions
+    - [ ] Write test: raises error if part already fits within bed (no split needed)
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement split plane calculator
+    - [ ] Create `splitting.py` module
+    - [ ] Implement `get_part_bbox(scad_path, part_name) -> dict` using OpenSCAD STL export + vertex parsing (reuse `stl_utils.py` bounding box extractor)
+    - [ ] Implement `calculate_split_planes(bbox, bed_x, bed_y, bed_z, margin) -> list[dict]` for auto mode
+    - [ ] Implement `validate_manual_split(bbox, axis, coord) -> dict` for manual mode
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement split plane calculation and bounding box extraction`
+
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Split Plane Calculation' (Protocol in workflow.md)
+
+## Phase 2: Joining Mechanism Generators
+
+- [ ] Task: Write tests for dovetail joint generator
+    - [ ] Write test: generates valid OpenSCAD code for dovetail fingers on a flat face
+    - [ ] Write test: male and female halves interlock (intersection volume > 0 when mated)
+    - [ ] Write test: clearance parameter widens female slots correctly
+    - [ ] Write test: finger count and dimensions are configurable
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement dovetail joint generator
+    - [ ] Add `generate_dovetail_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
+    - [ ] Generate OpenSCAD code for male (protruding) and female (recessed) dovetail geometry
+    - [ ] Apply clearance to female side
+    - [ ] Return SCAD code strings for union with each half
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement dovetail joint generator`
+
+- [ ] Task: Write tests for flange joint generator
+    - [ ] Write test: generates overlapping tab geometry with correct dimensions
+    - [ ] Write test: counterbored clearance holes on one half, hex nut pockets on the other
+    - [ ] Write test: screw count and size (M2, M3, M4) are configurable
+    - [ ] Write test: clearance parameter applied to hole diameters
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement flange joint generator
+    - [ ] Add `generate_flange_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
+    - [ ] Generate tab geometry with M3 counterbored holes and hex nut traps
+    - [ ] Use standard metric fastener dimensions (M3: 3.0mm shaft, 5.5mm head, 6.4mm nut width)
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement flange joint with screw/nut pockets`
+
+- [ ] Task: Write tests for tongue-and-groove and pin joint generators
+    - [ ] Write test: tongue-and-groove produces matching ridge and slot geometry
+    - [ ] Write test: pin holes are correctly sized and positioned on both halves
+    - [ ] Write test: clearance applied correctly to both joint types
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement tongue-and-groove and pin joint generators
+    - [ ] Add `generate_tongue_groove_scad(face_width, face_height, params) -> tuple[str, str]`
+    - [ ] Add `generate_pin_scad(face_width, face_height, params) -> tuple[str, str]`
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement tongue-groove and pin joint generators`
+
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
+
+## Phase 3: Part Splitting Engine & STL Export
+
+- [ ] Task: Write tests for part splitting engine
+    - [ ] Write test: splits a box into 2 halves at Z midpoint and exports 2 STL files
+    - [ ] Write test: each exported STL is manifold (non-zero volume)
+    - [ ] Write test: each segment fits within the specified bed dimensions
+    - [ ] Write test: joint features are correctly applied to split faces
+    - [ ] Write test: auto joint selection picks flange for Z-splits and dovetail for X/Y-splits
+    - [ ] Write test: explicit `joint_type` parameter overrides auto selection
+    - [ ] Write test: file naming follows `<name>_part_N.stl` convention
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement part splitting engine
+    - [ ] Add `split_part(scad_path, part_name, split_planes, joint_configs) -> list[dict]` to `splitting.py`
+    - [ ] For each split plane, generate temporary SCAD code that:
+      1. Intersects the original part with a half-space (cube positioned above/below the split plane)
+      2. Unions the appropriate joint geometry onto the split face
+    - [ ] Invoke OpenSCAD CLI to export each segment as STL
+    - [ ] Verify each STL has non-zero volume
+    - [ ] Implement `auto_select_joint(axis) -> str` for automatic joint selection
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement part splitting engine with joint application`
+
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
+
+## Phase 4: Exploded Preview & MCP Tool Integration
+
+- [ ] Task: Write tests for exploded preview render
+    - [ ] Write test: generates a PNG showing segments offset along split axis
+    - [ ] Write test: joint features are visible in the exploded view
+    - [ ] Write test: returns inline base64 image data
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement exploded preview render
+    - [ ] Add `generate_exploded_preview(scad_path, segments, split_axis, output_path) -> bytes`
+    - [ ] Generate temporary SCAD that translates each segment along the split axis with offset gaps
+    - [ ] Render via OpenSCAD CLI using isometric camera preset
+    - [ ] Return base64-encoded image
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(splitting): Implement exploded view preview render`
+
+- [ ] Task: Write tests for `split_for_printing` MCP tool
+    - [ ] Write test: tool is registered and appears in MCP schema
+    - [ ] Write test: auto mode returns structured JSON with correct segments for oversized part
+    - [ ] Write test: manual mode returns correct split at specified coordinate
+    - [ ] Write test: returns human-readable summary with file paths
+    - [ ] Write test: returns inline exploded preview PNG
+    - [ ] Run tests and confirm they all fail (Red phase)
+
+- [ ] Task: Implement `split_for_printing` MCP tool
+    - [ ] Add `@mcp.tool()` decorated `split_for_printing` function to `server.py`
+    - [ ] Wire up split plane calculation, joint generation, splitting engine, and preview
+    - [ ] Build structured JSON response matching the schema
+    - [ ] Build conversational human-readable summary
+    - [ ] Include absolute file paths for all exported STLs and preview
+    - [ ] Run tests and confirm they all pass (Green phase)
+    - [ ] Commit: `feat(server): Implement split_for_printing MCP tool`
+
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Exploded Preview & MCP Tool Integration' (Protocol in workflow.md)
+
+## Phase 5: Documentation & Final Verification
+
+- [ ] Task: Update documentation and installer
+    - [ ] Update `instructions.md` with `split_for_printing` tool documentation
+    - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
+    - [ ] Run `install.py` to verify schema exports correctly
+    - [ ] Commit: `docs(plugin): Add split_for_printing to instructions and skill`
+
+- [ ] Task: Final coverage verification
+    - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
+    - [ ] Fix any coverage gaps with targeted tests
+    - [ ] Run full test suite one final time
+    - [ ] Commit: `test(coverage): Ensure >80% coverage for splitting module`
+
+- [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Final Verification' (Protocol in workflow.md)

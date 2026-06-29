@@ -22,4 +22,10 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [ ] **Track: Implement panel nesting and sheet layout optimization tool (nest_panels)**
   *Link: [./tracks/nest_panels_20260629/](./tracks/nest_panels_20260629/)*
 
+---
+
+- [ ] **Track: Implement part splitting with joining mechanisms for 3D printing (split_for_printing)**
+  *Link: [./tracks/split_for_printing_20260629/](./tracks/split_for_printing_20260629/)*
+
+
 
