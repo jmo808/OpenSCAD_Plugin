@@ -6,7 +6,15 @@ import json
 import re
 from PIL import Image as PILImage, ImageDraw as PILImageDraw
 from mcp.server.fastmcp import FastMCP, Image
-from scad_utils import discover_parts, get_openscad_binary, validate_scad_path, run_openscad
+from scad_utils import (
+    discover_parts,
+    get_openscad_binary,
+    validate_scad_path,
+    run_openscad,
+    get_dxf_bounds,
+    get_dxf_bbox,
+    get_svg_bbox
+)
 from interference import run_pairwise_check, render_collision_highlight
 import base64
 from bom_parser import parse_bom_annotations, aggregate_bom, export_bom
@@ -202,54 +210,7 @@ def export_stl(scad_path: str, output_path: str) -> str:
 
 
 
-def get_dxf_bounds(dxf_path: str) -> tuple[float, float, float, float]:
-    """Parses a DXF file to return (x_min, x_max, y_min, y_max)."""
-    if not os.path.exists(dxf_path):
-        return 0.0, 0.0, 0.0, 0.0
-    with open(dxf_path, 'r') as f:
-        lines = f.read().splitlines()
-    xs = []
-    ys = []
-    for i, line in enumerate(lines):
-        stripped = line.strip()
-        if stripped == '10' and i + 1 < len(lines):
-            try:
-                xs.append(float(lines[i+1].strip()))
-            except ValueError:
-                pass
-        elif stripped == '20' and i + 1 < len(lines):
-            try:
-                ys.append(float(lines[i+1].strip()))
-            except ValueError:
-                pass
-    if xs and ys:
-        return min(xs), max(xs), min(ys), max(ys)
-    return 0.0, 0.0, 0.0, 0.0
 
-def get_dxf_bbox(dxf_path: str) -> tuple[float, float]:
-    """Computes the width and height of a 2D DXF file by parsing vertex coordinates."""
-    x_min, x_max, y_min, y_max = get_dxf_bounds(dxf_path)
-    return round(x_max - x_min, 2), round(y_max - y_min, 2)
-
-def get_svg_bbox(svg_path: str) -> tuple[float, float]:
-    """Computes the width and height of an SVG file by parsing width/height attributes."""
-    if not os.path.exists(svg_path):
-        return 0.0, 0.0
-    with open(svg_path, 'r') as f:
-        content = f.read()
-    svg_match = re.search(r'<svg[^>]+>', content)
-    if svg_match:
-        tag = svg_match.group(0)
-        width_m = re.search(r'width="([^"]+)"', tag)
-        height_m = re.search(r'height="([^"]+)"', tag)
-        if width_m and height_m:
-            w_str = re.sub(r'[a-zA-Z]+', '', width_m.group(1))
-            h_str = re.sub(r'[a-zA-Z]+', '', height_m.group(1))
-            try:
-                return round(float(w_str), 2), round(float(h_str), 2)
-            except ValueError:
-                pass
-    return 0.0, 0.0
 
 @mcp.tool()
 def export_2d_templates(
