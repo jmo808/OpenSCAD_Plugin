@@ -29,14 +29,14 @@
     - [x] Write test: captures correct `source_line` for block annotations
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement module-level metadata block parser
-    - [ ] Add `parse_block_bom(scad_path: str) -> list[dict]` to `bom_parser.py`
-    - [ ] Use regex to match `/* BOM:` ... `*/` blocks with YAML-like `key: value` lines
-    - [ ] Implement unified `parse_bom_annotations(scad_path: str) -> tuple[list[dict], list[str]]` that combines both parsers and returns (entries, warnings)
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(bom): Implement module-level metadata block parser`
+- [x] [0ecdeb1] Task: Implement module-level metadata block parser
+    - [x] Add `parse_block_bom(scad_path: str) -> list[dict]` to `bom_parser.py`
+    - [x] Use regex to match `/* BOM:` ... `*/` blocks with YAML-like `key: value` lines
+    - [x] Implement unified `parse_bom_annotations(scad_path: str) -> tuple[list[dict], list[str]]` that combines both parsers and returns (entries, warnings)
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(bom): Implement module-level metadata block parser`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: BOM Annotation Parser' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: BOM Annotation Parser' (Protocol in workflow.md)
 
 ## Phase 2: Aggregation & Grouping Engine
 
