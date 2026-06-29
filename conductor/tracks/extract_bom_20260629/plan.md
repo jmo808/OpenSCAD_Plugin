@@ -49,15 +49,15 @@
     - [x] Write test: computes correct `total_unique_items` and `total_quantity`
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement BOM aggregation engine
-    - [ ] Add `aggregate_bom(entries: list[dict]) -> dict` to `bom_parser.py`
-    - [ ] Implement case-insensitive grouping key: `(name.lower(), category.lower())`
-    - [ ] Sum `qty` across duplicates, keep first `supplier` and `part_number`
-    - [ ] Return dict with `categories` (grouped/sorted entries) and `summary` (totals)
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(bom): Implement aggregation and category grouping engine`
-
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Aggregation & Grouping Engine' (Protocol in workflow.md)
+- [x] [68743f6] Task: Implement BOM aggregation engine
+    - [x] Add `aggregate_bom(entries: list[dict]) -> dict` to `bom_parser.py`
+    - [x] Implement case-insensitive grouping key: `(name.lower(), category.lower())`
+    - [x] Sum `qty` across duplicates, keep first `supplier` and `part_number`
+    - [x] Return dict with `categories` (grouped/sorted entries) and `summary` (totals)
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(bom): Implement aggregation and category grouping engine`
+ 
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Aggregation & Grouping Engine' (Protocol in workflow.md)
 
 ## Phase 3: Multi-Format Export
 
