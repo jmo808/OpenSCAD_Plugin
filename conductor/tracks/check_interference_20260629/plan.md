@@ -103,7 +103,7 @@
     - [ ] Run `install.py` to verify schema exports correctly
     - [ ] Commit: `docs(plugin): Add check_interference to instructions and skill`
 
-- [ ] Task: Final coverage verification
+- [x] Task: Final coverage verification
     - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
     - [ ] Fix any coverage gaps with targeted tests
     - [ ] Run full test suite one final time
