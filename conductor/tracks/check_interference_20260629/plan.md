@@ -34,7 +34,7 @@
 
 - [x] [b3b0eaa] Task: Conductor - User Manual Verification 'Phase 1: STL Volume Parser & Shared Utilities' (Protocol in workflow.md)
 
-## Phase 2: Core Interference Detection Logic
+## Phase 2: Core Interference Detection Logic [checkpoint: ca3e65e]
 
 - [x] [a38fbf5] Task: Write tests for interference detection engine
     - [ ] Create test SCAD fixture with two overlapping cubes (known intersection volume)
@@ -57,7 +57,7 @@
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(interference): Implement pairwise collision detection engine`
 
-- [x] Task: Conductor - User Manual Verification 'Phase 2: Core Interference Detection Logic' (Protocol in workflow.md)
+- [x] [ca3e65e] Task: Conductor - User Manual Verification 'Phase 2: Core Interference Detection Logic' (Protocol in workflow.md)
 
 ## Phase 3: Visual Highlight Render
 
