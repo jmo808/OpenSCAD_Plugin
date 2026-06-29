@@ -6,12 +6,7 @@ import shutil
 
 # We will import from stl_utils, which we will implement next.
 # During RED phase, this import will fail or the functions won't exist.
-try:
-    from stl_utils import compute_stl_volume, extract_bounding_box
-except ImportError:
-    # Allow tests to compile so we can run them and see them fail (or fail during import)
-    compute_stl_volume = None
-    extract_bounding_box = None
+from stl_utils import compute_stl_volume, extract_bounding_box
 
 # Vertices for a 10x10x10 cube
 CUBE_VERTICES = [
