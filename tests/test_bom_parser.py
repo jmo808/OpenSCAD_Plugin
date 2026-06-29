@@ -85,3 +85,104 @@ def test_parse_inline_bom_empty(temp_dir):
     entries, warnings = parse_inline_bom(scad_path)
     assert len(entries) == 0
     assert len(warnings) == 0
+
+# Import block parser functions for testing
+from bom_parser import parse_block_bom, parse_bom_annotations
+
+def test_parse_block_bom_all_fields(temp_dir):
+    scad_content = """
+    /* BOM:
+     *   name: M3 hex nut
+     *   qty: 4
+     *   category: fastener
+     *   supplier: McMaster
+     *   part_number: 90590A005
+     */
+    module bracket_hardware() { }
+    """
+    scad_path = os.path.join(temp_dir, "model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+
+    entries, warnings = parse_block_bom(scad_path)
+    assert len(entries) == 1
+    assert len(warnings) == 0
+
+    entry = entries[0]
+    assert entry["name"] == "M3 hex nut"
+    assert entry["qty"] == 4
+    assert entry["category"] == "fastener"
+    assert entry["supplier"] == "McMaster"
+    assert entry["part_number"] == "90590A005"
+    # Block starts on line 2 (/* BOM:)
+    assert entry["source_line"] == 2
+
+def test_parse_block_bom_required_only(temp_dir):
+    scad_content = """
+    /* BOM:
+       name: M3 hex nut
+       qty: 4
+       category: fastener
+    */
+    """
+    scad_path = os.path.join(temp_dir, "model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+
+    entries, warnings = parse_block_bom(scad_path)
+    assert len(entries) == 1
+    assert len(warnings) == 0
+
+    entry = entries[0]
+    assert entry["name"] == "M3 hex nut"
+    assert entry["qty"] == 4
+    assert entry["category"] == "fastener"
+    assert "supplier" not in entry or entry["supplier"] is None
+    assert "part_number" not in entry or entry["part_number"] is None
+
+def test_parse_block_bom_malformed(temp_dir):
+    scad_content = """
+    /* BOM:
+       qty: 4
+       category: fastener
+    */
+    /* BOM:
+       name: M3 hex nut
+       qty: four
+       category: fastener
+    */
+    """
+    scad_path = os.path.join(temp_dir, "model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+
+    entries, warnings = parse_block_bom(scad_path)
+    assert len(entries) == 0
+    assert len(warnings) == 2
+    assert "line 2" in warnings[0].lower()
+    assert "line 6" in warnings[1].lower()
+
+def test_parse_bom_annotations_mixed(temp_dir):
+    scad_content = """
+    // BOM: M2.5 screw, qty=8, category=fastener
+    
+    /* BOM:
+     *   name: M3 hex nut
+     *   qty: 4
+     *   category: fastener
+     */
+    module bracket_hardware() { }
+    
+    // BOM: Malformed annotation without category, qty=2
+    """
+    scad_path = os.path.join(temp_dir, "model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+
+    entries, warnings = parse_bom_annotations(scad_path)
+    assert len(entries) == 2
+    assert len(warnings) == 1
+    assert entries[0]["name"] == "M2.5 screw"
+    assert entries[1]["name"] == "M3 hex nut"
+    assert "line 10" in warnings[0].lower()
+
