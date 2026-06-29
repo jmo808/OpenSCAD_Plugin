@@ -20,24 +20,24 @@
 
 ## Phase 2: `export_2d_templates` Tool
 
-- [ ] Task: Write tests for `export_2d_templates`
-    - [ ] Create a minimal test SCAD file with a `part` selector (e.g., `side_panel` and `back_panel`)
-    - [ ] Write test: exports DXF for a single named part
-    - [ ] Write test: exports SVG for a single named part
-    - [ ] Write test: exports both DXF and SVG when format="both"
-    - [ ] Write test: returns structured JSON with part_name, format, file_path, width_mm, height_mm
-    - [ ] Write test: raises FileNotFoundError for missing SCAD file
-    - [ ] Write test: returns human-readable summary with file paths
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] Task: Write tests for `export_2d_templates`
+    - [x] Create a minimal test SCAD file with a `part` selector (e.g., `side_panel` and `back_panel`)
+    - [x] Write test: exports DXF for a single named part
+    - [x] Write test: exports SVG for a single named part
+    - [x] Write test: exports both DXF and SVG when format="both"
+    - [x] Write test: returns structured JSON with part_name, format, file_path, width_mm, height_mm
+    - [x] Write test: raises FileNotFoundError for missing SCAD file
+    - [x] Write test: returns human-readable summary with file paths
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `export_2d_templates` tool
-    - [ ] Add `@mcp.tool()` decorated `export_2d_templates` function to `server.py`
-    - [ ] Implement SCAD part name parsing (regex for `if (part == "...")` branches)
-    - [ ] Implement per-part OpenSCAD CLI export (`-D "part=\"<name>\""` with `-o <output>.<ext>`)
-    - [ ] Build structured JSON response with file metadata
-    - [ ] Build human-readable summary text
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(export): Implement export_2d_templates MCP tool`
+- [x] [bdee8ce] Task: Implement `export_2d_templates` tool
+    - [x] Add `@mcp.tool()` decorated `export_2d_templates` function to `server.py`
+    - [x] Implement SCAD part name parsing (regex for `if (part == "...")` branches)
+    - [x] Implement per-part OpenSCAD CLI export (`-D "part=\"<name>\""` with `-o <output>.<ext>`)
+    - [x] Build structured JSON response with file metadata
+    - [x] Build human-readable summary text
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(export): Implement export_2d_templates MCP tool`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: export_2d_templates Tool' (Protocol in workflow.md)
 
