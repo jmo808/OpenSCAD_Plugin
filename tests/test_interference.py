@@ -109,3 +109,34 @@ def test_run_pairwise_check_fail_fast(overlapping_scad_file):
 def test_missing_file():
     with pytest.raises(FileNotFoundError):
         check_pair("nonexistent.scad", "cube_a", "cube_b")
+
+def test_generate_highlight_scad(local_tmp_path):
+    from interference import generate_highlight_scad
+    # Mock collision dict
+    collisions = [
+        {
+            "part_a": "cube_a",
+            "part_b": "cube_b",
+            "intersection_volume_mm3": 500.0,
+            "bounding_box": {}
+        }
+    ]
+    scad_code = generate_highlight_scad("model.scad", collisions, local_tmp_path)
+    assert "color(" in scad_code
+    assert "import(" in scad_code
+    assert "cube_a_cube_b_intersection.stl" in scad_code
+
+def test_render_collision_highlight(overlapping_scad_file, local_tmp_path):
+    from interference import render_collision_highlight, run_pairwise_check
+    parts = ["cube_a", "cube_b", "cube_c"]
+    collisions = run_pairwise_check(overlapping_scad_file, parts)
+    
+    output_png = os.path.join(local_tmp_path, "highlight.png")
+    try:
+        img_b64 = render_collision_highlight(overlapping_scad_file, collisions, output_png, img_size=200)
+        assert img_b64 is not None
+        assert len(img_b64) > 0
+        assert os.path.exists(output_png)
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found")
+
