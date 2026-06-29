@@ -151,3 +151,58 @@ def test_pack_shelf_multiple_sheets():
     assert sheets[1]["sheet_number"] == 2
     assert len(sheets[0]["panels"]) == 1
     assert len(sheets[1]["panels"]) == 1
+
+from nesting import pack_ffd
+
+def test_pack_ffd_sorting():
+    # Pass smaller panels first; FFD should sort them descending and place largest first
+    panels = [
+        {"part_name": "small", "width_mm": 50.0, "height_mm": 50.0},
+        {"part_name": "large", "width_mm": 100.0, "height_mm": 100.0}
+    ]
+    sheets = pack_ffd(panels, sheet_w=200.0, sheet_h=200.0, kerf=0.0)
+    assert len(sheets) == 1
+    sheet = sheets[0]
+    
+    # Large is placed first. With FFD, the first placed panel goes to (0,0)
+    large = next(p for p in sheet["panels"] if p["part_name"] == "large")
+    assert large["x"] == 0.0
+    assert large["y"] == 0.0
+    
+    # Small is placed next. Since large occupies 100x100, small can be placed at (100, 0)
+    small = next(p for p in sheet["panels"] if p["part_name"] == "small")
+    assert small["x"] == 100.0
+    assert small["y"] == 0.0
+
+def test_pack_ffd_rotation():
+    # Panel is 120x50. Sheet is 100x150. Kerf is 0.0
+    # Originally it doesn't fit (120 > 100). But rotated to 50x120 it fits.
+    panels = [
+        {"part_name": "panel_r", "width_mm": 120.0, "height_mm": 50.0}
+    ]
+    sheets = pack_ffd(panels, sheet_w=100.0, sheet_h=150.0, kerf=0.0)
+    assert len(sheets) == 1
+    sheet = sheets[0]
+    p = sheet["panels"][0]
+    assert p["rotated"] is True
+    assert p["width"] == 50.0
+    assert p["height"] == 120.0
+    assert p["x"] == 0.0
+    assert p["y"] == 0.0
+
+def test_pack_ffd_better_utilization():
+    # A set of panels that can be packed tightly into 1 sheet under FFD but would take 2 sheets under simple shelf packing.
+    panels = [
+        {"part_name": "p1", "width_mm": 150.0, "height_mm": 100.0},
+        {"part_name": "p2", "width_mm": 50.0, "height_mm": 200.0},
+        {"part_name": "p3", "width_mm": 150.0, "height_mm": 100.0}
+    ]
+    
+    # Verify shelf uses 2 sheets
+    sheets_shelf = pack_shelf(panels, sheet_w=200.0, sheet_h=200.0, kerf=0.0)
+    assert len(sheets_shelf) == 2
+    
+    # Verify FFD uses 1 sheet
+    sheets_ffd = pack_ffd(panels, sheet_w=200.0, sheet_h=200.0, kerf=0.0)
+    assert len(sheets_ffd) == 1
+    assert len(sheets_ffd[0]["panels"]) == 3
