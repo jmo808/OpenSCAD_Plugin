@@ -2,17 +2,17 @@
 
 ## Phase 1: BOM Annotation Parser
 
-- [ ] Task: Write tests for inline comment BOM parser
-    - [ ] Create test SCAD fixture with multiple `// BOM:` annotations (varying fields, categories)
-    - [ ] Write test: parses a single inline `// BOM:` annotation with all fields
-    - [ ] Write test: parses annotations with only required fields (name, qty, category)
-    - [ ] Write test: parses annotations with optional supplier and part_number fields
-    - [ ] Write test: captures correct `source_line` number for each annotation
-    - [ ] Write test: warns on malformed annotation (missing `name`) without crashing
-    - [ ] Write test: returns empty list for SCAD file with no BOM annotations
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [e43c0a7] Task: Write tests for inline comment BOM parser
+    - [x] Create test SCAD fixture with multiple `// BOM:` annotations (varying fields, categories)
+    - [x] Write test: parses a single inline `// BOM:` annotation with all fields
+    - [x] Write test: parses annotations with only required fields (name, qty, category)
+    - [x] Write test: parses annotations with optional supplier and part_number fields
+    - [x] Write test: captures correct `source_line` number for each annotation
+    - [x] Write test: warns on malformed annotation (missing `name`) without crashing
+    - [x] Write test: returns empty list for SCAD file with no BOM annotations
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement inline comment BOM parser
+- [~] Task: Implement inline comment BOM parser
     - [ ] Create `bom_parser.py` module
     - [ ] Implement `parse_inline_bom(scad_path: str) -> list[dict]` using regex to match `// BOM:` lines
     - [ ] Parse comma-separated key=value pairs after the `// BOM:` prefix
