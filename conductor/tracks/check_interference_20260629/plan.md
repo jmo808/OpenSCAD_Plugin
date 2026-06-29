@@ -61,7 +61,7 @@
 
 ## Phase 3: Visual Highlight Render
 
-- [ ] Task: Write tests for collision highlight render
+- [x] [177b008] Task: Write tests for collision highlight render
     - [ ] Write test: generates a PNG file for overlapping components with collision highlighted
     - [ ] Write test: PNG file exists at expected output path
     - [ ] Write test: returns inline base64 image data
