@@ -78,7 +78,7 @@
 
 - [x] [410e70f] Task: Conductor - User Manual Verification 'Phase 3: Visual Highlight Render' (Protocol in workflow.md)
 
-## Phase 4: MCP Tool Integration & Documentation
+## Phase 4: MCP Tool Integration & Documentation [checkpoint: 1e1360f]
 
 - [x] [08d5b5e] Task: Write tests for `check_interference` MCP tool
     - [ ] Write test: tool is registered and appears in MCP schema
@@ -109,4 +109,4 @@
     - [ ] Run full test suite one final time
     - [ ] Commit: `test(coverage): Ensure >80% coverage for interference module`
 
-- [x] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
+- [x] [1e1360f] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
