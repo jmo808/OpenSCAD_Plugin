@@ -8,13 +8,13 @@
     - [x] Verify `pytest --cov=. --cov-report=term` runs cleanly against existing code
     - [x] Commit: `chore(setup): Add testing infrastructure and Pillow dependency`
 
-- [ ] Task: Refactor `server.py` to extract shared utilities
-    - [ ] Write tests for `get_openscad_binary()` and a new `run_openscad()` helper
-    - [ ] Extract common OpenSCAD CLI invocation logic into a `run_openscad(args: list) -> subprocess.CompletedProcess` helper function
-    - [ ] Extract file validation logic into a `validate_scad_path(path: str) -> str` helper
-    - [ ] Ensure all existing tools use the new shared helpers
-    - [ ] Run tests to confirm no regressions
-    - [ ] Commit: `refactor(server): Extract shared OpenSCAD CLI utilities`
+- [x] [6c41667] Task: Refactor `server.py` to extract shared utilities
+    - [x] Write tests for `get_openscad_binary()` and a new `run_openscad()` helper
+    - [x] Extract common OpenSCAD CLI invocation logic into a `run_openscad(args: list) -> subprocess.CompletedProcess` helper function
+    - [x] Extract file validation logic into a `validate_scad_path(path: str) -> str` helper
+    - [x] Ensure all existing tools use the new shared helpers
+    - [x] Run tests to confirm no regressions
+    - [x] Commit: `refactor(server): Extract shared OpenSCAD CLI utilities`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Project Setup' (Protocol in workflow.md)
 
