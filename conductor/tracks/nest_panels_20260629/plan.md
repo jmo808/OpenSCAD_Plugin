@@ -11,15 +11,15 @@
     - [x] Write test: returns empty list for SCAD file with no part selector
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement panel dimension extraction
-    - [ ] Create `nesting.py` module
-    - [ ] Implement `extract_panel_dimensions(scad_path: str, parts: list[str] | None) -> list[dict]` that exports each part's 2D projection via OpenSCAD CLI and computes bounding box dimensions
-    - [ ] Reuse `discover_parts()` from `scad_utils.py` (created in check_interference track) or implement locally if that track hasn't been completed yet
-    - [ ] Return list of `{part_name, width_mm, height_mm}` dicts
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(nesting): Implement panel dimension extraction from SCAD`
+- [x] [c130cfd] Task: Implement panel dimension extraction
+    - [x] Create `nesting.py` module
+    - [x] Implement `extract_panel_dimensions(scad_path: str, parts: list[str] | None) -> list[dict]` that exports each part's 2D projection via OpenSCAD CLI and computes bounding box dimensions
+    - [x] Reuse `discover_parts()` from `scad_utils.py` (created in check_interference track) or implement locally if that track hasn't been completed yet
+    - [x] Return list of `{part_name, width_mm, height_mm}` dicts
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(nesting): Implement panel dimension extraction from SCAD`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Panel Dimension Extraction' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Panel Dimension Extraction' (Protocol in workflow.md)
 
 ## Phase 2: Packing Algorithms
 
