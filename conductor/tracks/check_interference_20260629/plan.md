@@ -68,7 +68,7 @@
     - [ ] Write test: no PNG generated when no collisions detected
     - [ ] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement collision highlight render
+- [x] [0fd21b8] Task: Implement collision highlight render
     - [ ] Add `generate_highlight_scad(scad_path, collisions) -> str` to generate SCAD that renders assembly with red intersection overlays
     - [ ] Use existing camera presets and `run_openscad()` helper to render PNG
     - [ ] Return base64-encoded image data for inline MCP response
