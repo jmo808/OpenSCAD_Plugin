@@ -59,8 +59,8 @@
  
 - [x] [b1e3738] Task: Conductor - User Manual Verification 'Phase 2: Aggregation & Grouping Engine' (Protocol in workflow.md)
 
-## Phase 3: Multi-Format Export
-
+## Phase 3: Multi-Format Export [checkpoint: ebc4863]
+ 
 - [x] [06ccf88] Task: Write tests for JSON, Markdown, and CSV export
     - [x] Write test: JSON output is valid and contains all required fields
     - [x] Write test: JSON includes `total_unique_items` and `total_quantity` summary
@@ -76,12 +76,12 @@
     - [x] Add `export_bom_csv(aggregated: dict, output_path: str)` function using `csv.writer`
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(bom): Implement JSON, Markdown, and CSV export formats`
+  
+- [x] [ebc4863] Task: Conductor - User Manual Verification 'Phase 3: Multi-Format Export' (Protocol in workflow.md)
  
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Multi-Format Export' (Protocol in workflow.md)
-
 ## Phase 4: MCP Tool Integration & Documentation
-
-- [ ] Task: Write tests for `extract_bom` MCP tool
+ 
+- [~] Task: Write tests for `extract_bom` MCP tool
     - [ ] Write test: tool is registered and appears in MCP schema
     - [ ] Write test: returns structured JSON with aggregated BOM for annotated fixture
     - [ ] Write test: returns human-readable summary with file paths
