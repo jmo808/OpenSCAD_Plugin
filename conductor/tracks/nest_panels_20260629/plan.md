@@ -32,15 +32,15 @@
     - [x] Write test: returns correct `utilization_percent` for known layout
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement shelf packing algorithm (simple)
-    - [ ] Add `pack_shelf(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
-    - [ ] Place panels left-to-right on horizontal shelves with kerf spacing
-    - [ ] Track current shelf height, advance to next shelf or next sheet as needed
-    - [ ] Compute utilization percentage per sheet
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(nesting): Implement shelf (simple) packing algorithm`
+- [x] [7824a1d] Task: Implement shelf packing algorithm (simple)
+    - [x] Add `pack_shelf(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
+    - [x] Place panels left-to-right on horizontal shelves with kerf spacing
+    - [x] Track current shelf height, advance to next shelf or next sheet as needed
+    - [x] Calculate `utilization_percent` and `waste_area_mm2` per sheet
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(nesting): Implement simple shelf packing algorithm`
 
-- [ ] Task: Write tests for FFD packing algorithm (optimized)
+- [~] Task: Write tests for optimized packing algorithm (FFD with rotation)
     - [ ] Write test: sorts panels by area descending before packing
     - [ ] Write test: rotates panels 90° when it yields a better fit
     - [ ] Write test: achieves equal or better utilization than shelf algorithm for the same input
