@@ -18,7 +18,7 @@
 
 - [x] [8881c70] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Project Setup' (Protocol in workflow.md)
 
-## Phase 2: `export_2d_templates` Tool
+## Phase 2: `export_2d_templates` Tool [checkpoint: 82eb332]
 
 - [x] Task: Write tests for `export_2d_templates`
     - [x] Create a minimal test SCAD file with a `part` selector (e.g., `side_panel` and `back_panel`)
@@ -39,7 +39,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(export): Implement export_2d_templates MCP tool`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: export_2d_templates Tool' (Protocol in workflow.md)
+- [x] [82eb332] Task: Conductor - User Manual Verification 'Phase 2: export_2d_templates Tool' (Protocol in workflow.md)
 
 ## Phase 3: `add_dimensions` Tool
 
