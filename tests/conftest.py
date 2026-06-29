@@ -37,9 +37,10 @@ module back_panel() {
 }
 
 if (part == "side_panel") {
-    side_panel();
+    projection() side_panel();
 } else if (part == "back_panel") {
-    back_panel();
+    // Project and rotate back panel flat to XY plane
+    projection() rotate([90, 0, 0]) back_panel();
 } else {
     side_panel();
     translate([0, 60, 0]) back_panel();

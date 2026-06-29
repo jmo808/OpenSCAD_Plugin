@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import shutil
 import json
+import re
 from mcp.server.fastmcp import FastMCP, Image
 
 # Initialize the FastMCP server
@@ -220,6 +221,147 @@ def export_stl(scad_path: str, output_path: str) -> str:
     size_kb = size_bytes / 1024.0
     
     return f"Successfully exported 3D geometry to STL at '{output_path}' ({size_kb:.2f} KB)."
+
+def discover_parts(scad_path: str) -> list[str]:
+    """Parses the SCAD file to find all part selector names."""
+    with open(scad_path, "r") as f:
+        content = f.read()
+    # Match patterns like: part == "side_panel" or part=="back_panel"
+    matches = re.findall(r'part\s*==\s*["\']([^"\']+)["\']', content)
+    parts = []
+    for m in matches:
+        if m != "all" and m not in parts:
+            parts.append(m)
+    return parts
+
+def get_dxf_bbox(dxf_path: str) -> tuple[float, float]:
+    """Computes the width and height of a 2D DXF file by parsing vertex coordinates."""
+    if not os.path.exists(dxf_path):
+        return 0.0, 0.0
+    with open(dxf_path, 'r') as f:
+        lines = f.read().splitlines()
+    xs = []
+    ys = []
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped == '10' and i + 1 < len(lines):
+            try:
+                xs.append(float(lines[i+1].strip()))
+            except ValueError:
+                pass
+        elif stripped == '20' and i + 1 < len(lines):
+            try:
+                ys.append(float(lines[i+1].strip()))
+            except ValueError:
+                pass
+    if xs and ys:
+        width = max(xs) - min(xs)
+        height = max(ys) - min(ys)
+        return round(width, 2), round(height, 2)
+    return 0.0, 0.0
+
+def get_svg_bbox(svg_path: str) -> tuple[float, float]:
+    """Computes the width and height of an SVG file by parsing width/height attributes."""
+    if not os.path.exists(svg_path):
+        return 0.0, 0.0
+    with open(svg_path, 'r') as f:
+        content = f.read()
+    svg_match = re.search(r'<svg[^>]+>', content)
+    if svg_match:
+        tag = svg_match.group(0)
+        width_m = re.search(r'width="([^"]+)"', tag)
+        height_m = re.search(r'height="([^"]+)"', tag)
+        if width_m and height_m:
+            w_str = re.sub(r'[a-zA-Z]+', '', width_m.group(1))
+            h_str = re.sub(r'[a-zA-Z]+', '', height_m.group(1))
+            try:
+                return round(float(w_str), 2), round(float(h_str), 2)
+            except ValueError:
+                pass
+    return 0.0, 0.0
+
+@mcp.tool()
+def export_2d_templates(
+    scad_path: str,
+    output_dir: str,
+    part_name: str = None,
+    format: str = "both"
+) -> list:
+    """Extracts individual panels from a 3D OpenSCAD assembly and exports them as flat 2D DXF/SVG vector files.
+
+    Args:
+        scad_path: Path to the source .scad file.
+        output_dir: Directory where DXF/SVG files will be written.
+        part_name: Optional name of a specific part/module to export. If omitted, exports all discovered parts.
+        format: Output format — 'dxf', 'svg', or 'both'.
+
+    Returns:
+        A list containing a text explanation and a JSON string of the exported files and metadata.
+    """
+    validate_scad_path(scad_path)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Determine parts to export
+    if part_name:
+        parts_to_export = [part_name]
+    else:
+        parts_to_export = discover_parts(scad_path)
+
+    if not parts_to_export:
+        return [
+            {"type": "text", "text": "No parts discovered or specified for export."},
+            {"type": "text", "text": "[]"}
+        ]
+
+    # Resolve formats
+    fmt = format.lower().strip()
+    formats_to_export = []
+    if fmt == "both":
+        formats_to_export = ["dxf", "svg"]
+    elif fmt in ["dxf", "svg"]:
+        formats_to_export = [fmt]
+    else:
+        raise ValueError(f"Invalid format '{format}'. Supported formats: 'dxf', 'svg', 'both'.")
+
+    exported_files = []
+    rendered_info = []
+
+    for part in parts_to_export:
+        for ext in formats_to_export:
+            filename = f"{part}.{ext}"
+            file_path = os.path.abspath(os.path.join(output_dir, filename))
+            
+            cmd_args = [
+                "-D", f'part="{part}"',
+                "-o", file_path,
+                scad_path
+            ]
+            
+            try:
+                run_openscad(cmd_args)
+                
+                # Extract dimensions
+                if ext == "dxf":
+                    width, height = get_dxf_bbox(file_path)
+                else:
+                    width, height = get_svg_bbox(file_path)
+                    
+                exported_files.append({
+                    "part_name": part,
+                    "format": ext,
+                    "file_path": file_path,
+                    "width_mm": width,
+                    "height_mm": height
+                })
+                rendered_info.append(f"{part}.{ext} ({width}x{height} mm)")
+            except Exception as e:
+                rendered_info.append(f"{part}.{ext} (failed: {str(e)})")
+
+    summary_text = f"Exported 2D templates to '{output_dir}': {', '.join(rendered_info)}."
+    text_content = {"type": "text", "text": summary_text}
+    json_content = {"type": "text", "text": json.dumps(exported_files, indent=2)}
+    
+    return [text_content, json_content]
 
 if __name__ == "__main__":
     mcp.run()
