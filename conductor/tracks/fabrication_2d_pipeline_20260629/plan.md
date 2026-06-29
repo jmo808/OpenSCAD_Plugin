@@ -1,6 +1,6 @@
 # Implementation Plan: 2D Fabrication Pipeline
 
-## Phase 1: Foundation & Project Setup
+## Phase 1: Foundation & Project Setup [checkpoint: 8881c70]
 
 - [x] [65e2025] Task: Set up testing infrastructure and project dependencies
     - [x] Add `pytest-cov` and `Pillow` to `pyproject.toml` dependencies
@@ -16,7 +16,7 @@
     - [x] Run tests to confirm no regressions
     - [x] Commit: `refactor(server): Extract shared OpenSCAD CLI utilities`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Project Setup' (Protocol in workflow.md)
+- [x] [8881c70] Task: Conductor - User Manual Verification 'Phase 1: Foundation & Project Setup' (Protocol in workflow.md)
 
 ## Phase 2: `export_2d_templates` Tool
 
