@@ -11,7 +11,7 @@
     - [ ] Write test: raises error for invalid/corrupt STL file
     - [ ] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement STL volume parser and bounding box extractor
+- [x] [411df53] Task: Implement STL volume parser and bounding box extractor
     - [ ] Create `stl_utils.py` module with `compute_stl_volume(stl_path: str) -> float` function
     - [ ] Implement signed tetrahedron volume formula for binary STL parsing
     - [ ] Implement `extract_bounding_box(stl_path: str) -> dict` function returning `{x_min, x_max, y_min, y_max, z_min, z_max}`
