@@ -165,5 +165,29 @@ def test_add_dimensions_missing_file():
     with pytest.raises(FileNotFoundError):
         add_dimensions("nonexistent.scad", "side_panel", "out.dxf")
 
+def test_generate_multiview(sample_scad_file, local_tmp_path):
+    from server import generate_multiview
+    from PIL import Image as PILImage
+    
+    output_png = os.path.join(local_tmp_path, "multiview.png")
+    try:
+        res = generate_multiview(sample_scad_file, output_path=output_png, img_size=200)
+        assert len(res) == 2
+        assert "multiview" in res[0]["text"]
+        assert res[1].type == "image"
+        
+        assert os.path.exists(output_png)
+        with PILImage.open(output_png) as img:
+            assert img.size == (200, 200)
+            
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_generate_multiview_missing_file():
+    from server import generate_multiview
+    with pytest.raises(FileNotFoundError):
+        generate_multiview("nonexistent.scad", "out.png")
+
+
 
 

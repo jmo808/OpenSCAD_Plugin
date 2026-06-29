@@ -509,5 +509,134 @@ draw_dim_y({y_min}, {y_max}, {dim_x}, "{label_y_esc}", {font_size_y});
 
     return f"Successfully generated dimensioned 2D template at '{output_path}' ({size_kb:.2f} KB)."
 
+@mcp.tool()
+def generate_multiview(
+    scad_path: str,
+    output_path: str,
+    img_size: int = 1024,
+    colorscheme: str = "Sunset",
+    views: list = None
+) -> list:
+    """Renders a single combined quadrant image containing front, side, top, and isometric views in one MCP call.
+
+    Args:
+        scad_path: Path to the source .scad file.
+        output_path: Path where the combined PNG will be written.
+        img_size: Total resolution (width and height) of the combined image. Defaults to 1024.
+        colorscheme: Color palette to apply to the renders. Defaults to 'Sunset'.
+        views: List of up to 4 views to render. Defaults to ['front', 'right', 'top', 'isometric'].
+
+    Returns:
+        A list containing a text explanation and the base64-encoded Image content of the combined quadrant view.
+    """
+    validate_scad_path(scad_path)
+
+    if not views:
+        views = ["front", "right", "top", "isometric"]
+
+    # Limit to 4 views
+    views_to_render = views[:4]
+
+    camera_presets = {
+        "isometric": "0,0,0,55,0,45,0",
+        "top": "0,0,0,0,0,0,0",
+        "front": "0,0,0,90,0,0,0",
+        "right": "0,0,0,90,0,90,0",
+        "bottom": "0,0,0,180,0,0,0",
+        "back": "0,0,0,90,0,180,0"
+    }
+
+    half_size = img_size // 2
+
+    # Create composite image using PIL
+    from PIL import Image as PILImage, ImageDraw as PILImageDraw
+    
+    composite_img = PILImage.new("RGB", (img_size, img_size), color=(240, 240, 240))
+    draw = PILImageDraw.Draw(composite_img)
+
+    # Temporary directory for rendering individual quadrants
+    import uuid
+    temp_id = str(uuid.uuid4())
+    temp_dir = os.path.expanduser(f"~/.openscad_temp/{temp_id}")
+    os.makedirs(temp_dir, exist_ok=True)
+
+    rendered_views = []
+
+    try:
+        # Quadrant coordinates: (x, y) offsets
+        quadrants = [
+            (0, 0),
+            (half_size, 0),
+            (0, half_size),
+            (half_size, half_size)
+        ]
+
+        for i, view in enumerate(views_to_render):
+            view_lower = view.lower().strip()
+            if view_lower not in camera_presets:
+                continue
+                
+            camera_args = camera_presets[view_lower]
+            temp_png = os.path.join(temp_dir, f"{view_lower}.png")
+            
+            cmd_args = [
+                "-o", temp_png,
+                "--imgsize", f"{half_size},{half_size}",
+                "--projection", "o",  # ortho is standard for engineering views
+                "--colorscheme", colorscheme,
+                "--autocenter",
+                "--viewall",
+                f"--camera={camera_args}",
+                scad_path
+            ]
+            
+            try:
+                run_openscad(cmd_args)
+                if os.path.exists(temp_png):
+                    with PILImage.open(temp_png) as img:
+                        # Paste into the respective quadrant
+                        composite_img.paste(img, quadrants[i])
+                    rendered_views.append(view_lower.upper())
+            except Exception as e:
+                # If a view fails to render, draw a placeholder warning text in that quadrant
+                x_off, y_off = quadrants[i]
+                draw.rectangle([x_off, y_off, x_off + half_size, y_off + half_size], fill=(255, 230, 230))
+                draw.text((x_off + 10, y_off + 10), f"Error rendering: {view_lower}", fill=(150, 0, 0))
+                rendered_views.append(f"{view_lower.upper()} (FAILED)")
+
+        # Draw grid line separators
+        draw.line([(half_size, 0), (half_size, img_size)], fill=(200, 200, 200), width=2)
+        draw.line([(0, half_size), (img_size, half_size)], fill=(200, 200, 200), width=2)
+
+        # Draw view labels on each quadrant
+        for i, view in enumerate(views_to_render):
+            x_off, y_off = quadrants[i]
+            # Draw a subtle background for the label
+            draw.rectangle([x_off + 5, y_off + 5, x_off + 100, y_off + 25], fill=(220, 220, 220))
+            draw.text((x_off + 10, y_off + 8), view.upper(), fill=(50, 50, 50))
+
+        # Save to final output path
+        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+        composite_img.save(output_path, "PNG")
+
+    finally:
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+
+    if not os.path.exists(output_path):
+        raise RuntimeError(f"Failed to generate composite multiview image at '{output_path}'.")
+
+    # Read composite image bytes for base64 output
+    with open(output_path, "rb") as f:
+        img_bytes = f.read()
+
+    summary_text = f"Successfully generated composite 2x2 multiview image containing {', '.join(rendered_views)} at '{output_path}'."
+    text_content = {"type": "text", "text": summary_text}
+    
+    # Create Image wrapper and convert to MCP image content representation
+    img_content = Image(data=img_bytes, format="png").to_image_content()
+    
+    return [text_content, img_content]
+
 if __name__ == "__main__":
     mcp.run()
