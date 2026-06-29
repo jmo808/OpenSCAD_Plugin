@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.scad
+*.svg
+*.dxf
+*.png
+.uv/
+.mypy_cache/
+.pytest_cache/

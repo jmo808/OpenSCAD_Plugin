@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "openscad-mcp": {
+      "command": "/home/jules/.local/bin/uv",
+      "args": [
+        "run",
+        "--project",
+        "/home/jules/Development/openscadPlugin",
+        "/home/jules/Development/openscadPlugin/server.py"
+      ],
+      "env": {
+        "OPENSCAD_BINARY_PATH": "/home/jules/.local/bin/openscad",
+        "OPENSCAD_DEFAULT_TOLERANCE": "0.05"
+      }
+    }
+  }
+}
