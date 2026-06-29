@@ -9,6 +9,7 @@ from mcp.server.fastmcp import FastMCP, Image
 from scad_utils import discover_parts, get_openscad_binary, validate_scad_path, run_openscad
 from interference import run_pairwise_check, render_collision_highlight
 import base64
+from bom_parser import parse_bom_annotations, aggregate_bom, export_bom
 
 # Initialize the FastMCP server
 mcp = FastMCP("openscad-mcp")
@@ -673,6 +674,71 @@ def check_interference(
     except Exception as e:
         warning_text = summary_text + f"\n\nWarning: Failed to render visual highlight: {str(e)}"
         return [{"type": "text", "text": warning_text}, json_block]
+
+@mcp.tool()
+def extract_bom(
+    scad_path: str,
+    output_dir: str = None,
+    formats: list = None
+) -> list:
+    """Parses tagged hardware annotations in an OpenSCAD source file and compiles a Bill of Materials.
+    
+    Args:
+        scad_path: Path to the OpenSCAD source file to parse.
+        output_dir: Directory where the output files (bom.json, bom.md, bom.csv) will be saved.
+                    Defaults to '~/.openscad_bom/'.
+        formats: List of formats to export. Defaults to ["json", "md", "csv"].
+        
+    Returns:
+        A list of MCP content blocks (conversational summary, and JSON structured BOM data).
+    """
+    validate_scad_path(scad_path)
+    
+    if formats is None:
+        formats = ["json", "md", "csv"]
+        
+    if output_dir is None:
+        output_dir = os.path.expanduser("~/.openscad_bom/")
+    else:
+        output_dir = os.path.abspath(output_dir)
+        
+    entries, warnings = parse_bom_annotations(scad_path)
+    
+    if not entries:
+        summary = "No BOM annotations found in the SCAD file. To add hardware items, use `// BOM: <name>, qty=<n>, category=<cat>` comments or /* BOM: ... */ blocks."
+        if warnings:
+            summary += "\n\nWarnings:\n" + "\n".join(f"- {w}" for w in warnings)
+        return [{"type": "text", "text": summary}, {"type": "text", "text": "{}"}]
+        
+    aggregated = aggregate_bom(entries)
+    
+    paths = export_bom(aggregated, output_dir=output_dir, formats=formats)
+    
+    summary_parts = []
+    total_unique = aggregated["summary"]["total_unique_items"]
+    total_qty = aggregated["summary"]["total_quantity"]
+    categories_count = len(aggregated["categories"])
+    
+    summary_parts.append(
+        f"Found {total_unique} hardware items across {categories_count} categories ({total_qty} total parts)."
+    )
+    
+    exported_list = ", ".join(f"bom.{fmt}" for fmt in formats)
+    summary_parts.append(f"BOM exported to {len(formats)} formats: {exported_list}.")
+    summary_parts.append(f"Output directory: '{output_dir}'")
+    
+    if warnings:
+        summary_parts.append("\nWarnings encountered during parsing:")
+        for w in warnings:
+            summary_parts.append(f"- {w}")
+            
+    summary_text = "\n".join(summary_parts)
+    json_text = json.dumps(aggregated, indent=2)
+    
+    return [
+        {"type": "text", "text": summary_text},
+        {"type": "text", "text": json_text}
+    ]
 
 if __name__ == "__main__":
     mcp.run()
