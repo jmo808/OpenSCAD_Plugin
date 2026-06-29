@@ -61,16 +61,16 @@
 
 ## Phase 3: Multi-Format Export
 
-- [~] Task: Write tests for JSON, Markdown, and CSV export
-    - [ ] Write test: JSON output is valid and contains all required fields
-    - [ ] Write test: JSON includes `total_unique_items` and `total_quantity` summary
-    - [ ] Write test: Markdown output has correct table headers and category group headings
-    - [ ] Write test: CSV output is parseable with Python `csv.reader` and has correct headers
-    - [ ] Write test: all three files are written to the specified `output_dir`
-    - [ ] Write test: only requested formats are exported when `formats` parameter is specified
-    - [ ] Run tests and confirm they all fail (Red phase)
-
-- [ ] Task: Implement multi-format BOM export
+- [x] [06ccf88] Task: Write tests for JSON, Markdown, and CSV export
+    - [x] Write test: JSON output is valid and contains all required fields
+    - [x] Write test: JSON includes `total_unique_items` and `total_quantity` summary
+    - [x] Write test: Markdown output has correct table headers and category group headings
+    - [x] Write test: CSV output is parseable with Python `csv.reader` and has correct headers
+    - [x] Write test: all three files are written to the specified `output_dir`
+    - [x] Write test: only requested formats are exported when `formats` parameter is specified
+    - [x] Run tests and confirm they all fail (Red phase)
+ 
+- [~] Task: Implement multi-format BOM export
     - [ ] Add `export_bom_json(aggregated: dict, output_path: str)` function
     - [ ] Add `export_bom_markdown(aggregated: dict, output_path: str)` function with category headers and table formatting
     - [ ] Add `export_bom_csv(aggregated: dict, output_path: str)` function using `csv.writer`
