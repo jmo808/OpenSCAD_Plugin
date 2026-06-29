@@ -1,6 +1,17 @@
 import os
 import pytest
-from server import generate_scad, compile_and_preview, export_stl, get_openscad_binary
+import json
+import subprocess
+import asyncio
+from PIL import Image as PILImage
+
+from server import (
+    generate_scad, compile_and_preview, export_stl, get_openscad_binary,
+    validate_scad_path, run_openscad, export_2d_templates, add_dimensions,
+    generate_multiview, get_dxf_bbox, get_svg_bbox, mcp
+)
+import install
+
 
 def test_get_openscad_binary():
     try:
@@ -57,7 +68,6 @@ def test_export_stl_missing_file():
         export_stl("nonexistent_file.scad", "output.stl")
 
 def test_validate_scad_path(sample_scad_file):
-    from server import validate_scad_path
     path = validate_scad_path(sample_scad_file)
     assert path == sample_scad_file
     
@@ -65,8 +75,6 @@ def test_validate_scad_path(sample_scad_file):
         validate_scad_path("nonexistent.scad")
 
 def test_run_openscad(sample_scad_file, local_tmp_path):
-    from server import run_openscad
-    import subprocess
     output_path = os.path.join(local_tmp_path, "output.stl")
     
     try:
@@ -85,8 +93,6 @@ def test_run_openscad(sample_scad_file, local_tmp_path):
         pass
 
 def test_export_2d_templates_single(sample_scad_file, local_tmp_path):
-    from server import export_2d_templates
-    import json
     
     output_dir = os.path.join(local_tmp_path, "export_single")
     try:
@@ -107,8 +113,6 @@ def test_export_2d_templates_single(sample_scad_file, local_tmp_path):
         pytest.skip("OpenSCAD binary not found/available")
 
 def test_export_2d_templates_all(sample_scad_file, local_tmp_path):
-    from server import export_2d_templates
-    import json
     
     output_dir = os.path.join(local_tmp_path, "export_all")
     try:
@@ -125,13 +129,10 @@ def test_export_2d_templates_all(sample_scad_file, local_tmp_path):
         pytest.skip("OpenSCAD binary not found/available")
 
 def test_export_2d_templates_missing_file():
-    from server import export_2d_templates
     with pytest.raises(FileNotFoundError):
         export_2d_templates("nonexistent.scad", output_dir="out")
 
 def test_add_dimensions(sample_scad_file, local_tmp_path):
-    from server import add_dimensions, get_dxf_bbox, get_svg_bbox
-    import json
     
     output_dxf = os.path.join(local_tmp_path, "dim_output.dxf")
     output_svg = os.path.join(local_tmp_path, "dim_output.svg")
@@ -161,13 +162,10 @@ def test_add_dimensions(sample_scad_file, local_tmp_path):
         pytest.skip("OpenSCAD binary not found/available")
 
 def test_add_dimensions_missing_file():
-    from server import add_dimensions
     with pytest.raises(FileNotFoundError):
         add_dimensions("nonexistent.scad", "side_panel", "out.dxf")
 
 def test_generate_multiview(sample_scad_file, local_tmp_path):
-    from server import generate_multiview
-    from PIL import Image as PILImage
     
     output_png = os.path.join(local_tmp_path, "multiview.png")
     try:
@@ -184,13 +182,10 @@ def test_generate_multiview(sample_scad_file, local_tmp_path):
         pytest.skip("OpenSCAD binary not found/available")
 
 def test_generate_multiview_missing_file():
-    from server import generate_multiview
     with pytest.raises(FileNotFoundError):
         generate_multiview("nonexistent.scad", "out.png")
 
 def test_mcp_registration():
-    from server import mcp
-    import asyncio
     
     tools = asyncio.run(mcp.list_tools())
     tool_names = [t.name for t in tools]
@@ -240,7 +235,6 @@ def test_skill_references():
         assert t in content
 
 def test_installer(local_tmp_path, monkeypatch):
-    import install
     
     mock_schema_dir = os.path.join(local_tmp_path, "schema")
     mock_plugin_dir = os.path.join(local_tmp_path, "plugin")

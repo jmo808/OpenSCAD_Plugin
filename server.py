@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import json
 import re
+from PIL import Image as PILImage, ImageDraw as PILImageDraw
 from mcp.server.fastmcp import FastMCP, Image
 
 # Initialize the FastMCP server
@@ -392,10 +393,9 @@ def add_dimensions(
     validate_scad_path(scad_path)
 
     # 1. Export 2D template to temporary dir to get geometry bounds
-    import uuid
-    temp_id = str(uuid.uuid4())
-    temp_dir = os.path.expanduser(f"~/.openscad_temp/{temp_id}")
-    os.makedirs(temp_dir, exist_ok=True)
+    base_temp_dir = os.path.expanduser("~/.openscad_temp")
+    os.makedirs(base_temp_dir, exist_ok=True)
+    temp_dir = tempfile.mkdtemp(dir=base_temp_dir, prefix="add_dim_")
     
     try:
         temp_out = os.path.join(temp_dir, f"{part_name}.dxf")
@@ -549,16 +549,13 @@ def generate_multiview(
     half_size = img_size // 2
 
     # Create composite image using PIL
-    from PIL import Image as PILImage, ImageDraw as PILImageDraw
-    
     composite_img = PILImage.new("RGB", (img_size, img_size), color=(240, 240, 240))
     draw = PILImageDraw.Draw(composite_img)
 
     # Temporary directory for rendering individual quadrants
-    import uuid
-    temp_id = str(uuid.uuid4())
-    temp_dir = os.path.expanduser(f"~/.openscad_temp/{temp_id}")
-    os.makedirs(temp_dir, exist_ok=True)
+    base_temp_dir = os.path.expanduser("~/.openscad_temp")
+    os.makedirs(base_temp_dir, exist_ok=True)
+    temp_dir = tempfile.mkdtemp(dir=base_temp_dir, prefix="multiview_")
 
     rendered_views = []
 
