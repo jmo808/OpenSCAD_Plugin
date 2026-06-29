@@ -258,14 +258,14 @@ def test_check_interference_tool(overlapping_scad_file, local_tmp_path):
         assert len(res) == 3
         
         # Check text summary
-        assert "collisions detected" in res[0].text
-        assert "cube_a" in res[0].text
+        assert "collision(s) detected" in res[0]["text"]
+        assert "cube_a" in res[0]["text"]
         
         # Check image base64
         assert res[1].type == "image"
         
         # Check JSON structured data
-        json_data = json.loads(res[2].text)
+        json_data = json.loads(res[2]["text"])
         assert len(json_data) == 1
         assert json_data[0]["part_a"] == "cube_a"
         assert json_data[0]["part_b"] == "cube_b"
@@ -282,8 +282,8 @@ def test_check_interference_tool_clean(sample_scad_file, local_tmp_path):
     try:
         res = check_interference(sample_scad_file, fail_fast=False, output_path=output_png, img_size=200)
         assert len(res) == 2  # No image rendered since no collisions
-        assert "no collisions detected" in res[0].text
-        assert res[1].text == "[]" # JSON empty list
+        assert "no collisions detected" in res[0]["text"]
+        assert res[1]["text"] == "[]" # JSON empty list
         
         assert not os.path.exists(output_png)
     except FileNotFoundError:

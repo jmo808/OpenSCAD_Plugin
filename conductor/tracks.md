@@ -6,7 +6,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 
 
-- [ ] **Track: Implement collision detection and interference checking tool (check_interference)**
+- [~] **Track: Implement collision detection and interference checking tool (check_interference)**
   *Link: [./tracks/check_interference_20260629/](./tracks/check_interference_20260629/)*
 
 ---
