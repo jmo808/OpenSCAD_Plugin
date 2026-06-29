@@ -1,6 +1,6 @@
 # Implementation Plan: Panel Nesting & Sheet Layout Optimization Tool
 
-## Phase 1: Panel Dimension Extraction
+## Phase 1: Panel Dimension Extraction [checkpoint: 67292da]
 
 - [x] [b3990bc] Task: Write tests for panel dimension extraction
     - [x] Create test SCAD fixture with 3-4 parts of known dimensions
@@ -19,11 +19,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement panel dimension extraction from SCAD`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Panel Dimension Extraction' (Protocol in workflow.md)
+- [x] [67292da] Task: Conductor - User Manual Verification 'Phase 1: Panel Dimension Extraction' (Protocol in workflow.md)
 
 ## Phase 2: Packing Algorithms
 
-- [ ] Task: Write tests for shelf packing algorithm (simple)
+- [~] Task: Write tests for shelf packing algorithm (simple)
     - [ ] Write test: packs 3 rectangles onto a sheet without overlap
     - [ ] Write test: kerf gaps are applied between panels and from sheet edges
     - [ ] Write test: starts a new shelf when current shelf is full
