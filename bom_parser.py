@@ -90,3 +90,99 @@ def parse_inline_bom(scad_path: str) -> tuple[list[dict], list[str]]:
             entries.append(entry)
             
     return entries, warnings
+
+def parse_block_bom(scad_path: str) -> tuple[list[dict], list[str]]:
+    """Parses block BOM annotations (/* BOM: ... */) from a SCAD file.
+    
+    Returns:
+        (entries, warnings)
+    """
+    if not os.path.exists(scad_path):
+        raise FileNotFoundError(f"SCAD file not found at: '{scad_path}'")
+        
+    entries = []
+    warnings = []
+    
+    with open(scad_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+        
+    pattern = re.compile(r'/\*\s*BOM:([\s\S]*?)\*/')
+    
+    for match in pattern.finditer(content):
+        start_pos = match.start()
+        source_line = content[:start_pos].count('\n') + 1
+        
+        block_text = match.group(1)
+        lines = block_text.split('\n')
+        fields = {}
+        
+        for line in lines:
+            line_stripped = line.strip()
+            if not line_stripped:
+                continue
+            if line_stripped.startswith('*'):
+                line_stripped = line_stripped[1:].strip()
+            if not line_stripped:
+                continue
+                
+            if ':' in line_stripped:
+                k, v = line_stripped.split(':', 1)
+                fields[k.strip().lower()] = v.strip()
+                
+        name = fields.get('name')
+        qty_str = fields.get('qty')
+        category = fields.get('category')
+        
+        if not name:
+            warnings.append(f"Line {source_line}: Malformed BOM block (missing name)")
+            continue
+        if not category:
+            warnings.append(f"Line {source_line}: Malformed BOM block (missing category)")
+            continue
+        if qty_str is None:
+            warnings.append(f"Line {source_line}: Malformed BOM block (missing quantity)")
+            continue
+            
+        try:
+            qty = int(qty_str)
+        except ValueError:
+            warnings.append(f"Line {source_line}: Malformed BOM block (invalid quantity '{qty_str}')")
+            continue
+            
+        entry = {
+            "name": name,
+            "qty": qty,
+            "category": category,
+            "source_line": source_line
+        }
+        
+        if "supplier" in fields:
+            entry["supplier"] = fields["supplier"]
+        if "part_number" in fields:
+            entry["part_number"] = fields["part_number"]
+        elif "part_no" in fields:
+            entry["part_number"] = fields["part_no"]
+            
+        entries.append(entry)
+        
+    return entries, warnings
+
+def parse_bom_annotations(scad_path: str) -> tuple[list[dict], list[str]]:
+    """Combines inline and block BOM annotation parsing from a SCAD file.
+    
+    Returns:
+        (entries, warnings) sorted by line number.
+    """
+    inline_entries, inline_warnings = parse_inline_bom(scad_path)
+    block_entries, block_warnings = parse_block_bom(scad_path)
+    
+    all_entries = inline_entries + block_entries
+    all_entries.sort(key=lambda x: x["source_line"])
+    
+    all_warnings = inline_warnings + block_warnings
+    def warn_key(w):
+        m = re.search(r'Line (\d+)', w)
+        return int(m.group(1)) if m else 0
+    all_warnings.sort(key=warn_key)
+    
+    return all_entries, all_warnings

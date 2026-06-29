@@ -184,5 +184,5 @@ def test_parse_bom_annotations_mixed(temp_dir):
     assert len(warnings) == 1
     assert entries[0]["name"] == "M2.5 screw"
     assert entries[1]["name"] == "M3 hex nut"
-    assert "line 10" in warnings[0].lower()
+    assert "line 11" in warnings[0].lower()
 
