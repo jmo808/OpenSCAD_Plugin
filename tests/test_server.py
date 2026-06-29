@@ -79,7 +79,7 @@ def test_run_openscad(sample_scad_file, local_tmp_path):
 
     # test failing command
     try:
-        with pytest.raises(subprocess.CalledProcessError):
+        with pytest.raises(RuntimeError):
             run_openscad(["-o", output_path, "nonexistent.scad"])
     except FileNotFoundError:
         pass
@@ -128,5 +128,42 @@ def test_export_2d_templates_missing_file():
     from server import export_2d_templates
     with pytest.raises(FileNotFoundError):
         export_2d_templates("nonexistent.scad", output_dir="out")
+
+def test_add_dimensions(sample_scad_file, local_tmp_path):
+    from server import add_dimensions, get_dxf_bbox, get_svg_bbox
+    import json
+    
+    output_dxf = os.path.join(local_tmp_path, "dim_output.dxf")
+    output_svg = os.path.join(local_tmp_path, "dim_output.svg")
+    
+    try:
+        # 1. Export in DXF
+        res_dxf = add_dimensions(sample_scad_file, part_name="side_panel", output_path=output_dxf, units="mm", offset=15.0)
+        assert "dim_output.dxf" in res_dxf
+        assert os.path.exists(output_dxf)
+        
+        # Verify the dimensions of the output dxf
+        # Original side_panel is 10 x 50. With 15mm offset in X and Y, the new bbox width/height should be larger
+        w_dxf, h_dxf = get_dxf_bbox(output_dxf)
+        assert w_dxf > 10 + 10  # original 10 + offset margin
+        assert h_dxf > 50 + 10  # original 50 + offset margin
+        
+        # 2. Export in SVG
+        res_svg = add_dimensions(sample_scad_file, part_name="side_panel", output_path=output_svg, units="inches", offset=10.0)
+        assert "dim_output.svg" in res_svg
+        assert os.path.exists(output_svg)
+        
+        w_svg, h_svg = get_svg_bbox(output_svg)
+        assert w_svg > 10 + 5
+        assert h_svg > 50 + 5
+        
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_add_dimensions_missing_file():
+    from server import add_dimensions
+    with pytest.raises(FileNotFoundError):
+        add_dimensions("nonexistent.scad", "side_panel", "out.dxf")
+
 
 

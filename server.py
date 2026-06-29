@@ -39,7 +39,10 @@ def run_openscad(args: list) -> subprocess.CompletedProcess:
     """Executes the OpenSCAD binary with the given arguments."""
     openscad_bin = get_openscad_binary()
     cmd = [openscad_bin] + args
-    return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+    try:
+        return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"OpenSCAD execution failed for command {cmd}:\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}")
 
 @mcp.tool()
 def generate_scad(scad_code: str, output_path: str, parameters: dict = None) -> str:
@@ -234,10 +237,10 @@ def discover_parts(scad_path: str) -> list[str]:
             parts.append(m)
     return parts
 
-def get_dxf_bbox(dxf_path: str) -> tuple[float, float]:
-    """Computes the width and height of a 2D DXF file by parsing vertex coordinates."""
+def get_dxf_bounds(dxf_path: str) -> tuple[float, float, float, float]:
+    """Parses a DXF file to return (x_min, x_max, y_min, y_max)."""
     if not os.path.exists(dxf_path):
-        return 0.0, 0.0
+        return 0.0, 0.0, 0.0, 0.0
     with open(dxf_path, 'r') as f:
         lines = f.read().splitlines()
     xs = []
@@ -255,10 +258,13 @@ def get_dxf_bbox(dxf_path: str) -> tuple[float, float]:
             except ValueError:
                 pass
     if xs and ys:
-        width = max(xs) - min(xs)
-        height = max(ys) - min(ys)
-        return round(width, 2), round(height, 2)
-    return 0.0, 0.0
+        return min(xs), max(xs), min(ys), max(ys)
+    return 0.0, 0.0, 0.0, 0.0
+
+def get_dxf_bbox(dxf_path: str) -> tuple[float, float]:
+    """Computes the width and height of a 2D DXF file by parsing vertex coordinates."""
+    x_min, x_max, y_min, y_max = get_dxf_bounds(dxf_path)
+    return round(x_max - x_min, 2), round(y_max - y_min, 2)
 
 def get_svg_bbox(svg_path: str) -> tuple[float, float]:
     """Computes the width and height of an SVG file by parsing width/height attributes."""
@@ -362,6 +368,146 @@ def export_2d_templates(
     json_content = {"type": "text", "text": json.dumps(exported_files, indent=2)}
     
     return [text_content, json_content]
+
+@mcp.tool()
+def add_dimensions(
+    scad_path: str,
+    part_name: str,
+    output_path: str,
+    units: str = "mm",
+    offset: float = 12.0
+) -> str:
+    """Injects external blueprint-style dimension annotations onto 2D panel projections.
+
+    Args:
+        scad_path: Path to the source .scad file.
+        part_name: Name of the part to dimension.
+        output_path: Path where the dimensioned DXF/SVG will be written.
+        units: Dimension units — 'mm' or 'inches'.
+        offset: Distance in mm from the panel edge to place dimension lines.
+
+    Returns:
+        A success message with the output file details.
+    """
+    validate_scad_path(scad_path)
+
+    # 1. Export 2D template to temporary dir to get geometry bounds
+    import uuid
+    temp_id = str(uuid.uuid4())
+    temp_dir = os.path.expanduser(f"~/.openscad_temp/{temp_id}")
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    try:
+        temp_out = os.path.join(temp_dir, f"{part_name}.dxf")
+        # Invoke export_2d_templates internally
+        export_2d_templates(scad_path, output_dir=temp_dir, part_name=part_name, format="dxf")
+        # Get bounds
+        x_min, x_max, y_min, y_max = get_dxf_bounds(temp_out)
+    finally:
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+            
+    span_x = x_max - x_min
+    span_y = y_max - y_min
+    
+    if span_x <= 0 or span_y <= 0:
+        raise ValueError(f"Could not extract valid 2D geometry bounds for part '{part_name}'.")
+
+    # Font sizing: max(3.5, min(6.0, span * 0.04))
+    font_size_x = max(3.5, min(6.0, span_x * 0.04))
+    font_size_y = max(3.5, min(6.0, span_y * 0.04))
+
+    # Format labels
+    if units.lower().startswith("inch"):
+        label_x = f"{span_x / 25.4:.2f}\""
+        label_y = f"{span_y / 25.4:.2f}\""
+    else:
+        label_x = f"{span_x:.1f}mm"
+        label_y = f"{span_y:.1f}mm"
+
+    # Escape double quotes for OpenSCAD string literal safety
+    label_x_esc = label_x.replace('"', '\\"')
+    label_y_esc = label_y.replace('"', '\\"')
+
+    # Coordinates for dimension lines: place in negative space relative to the bounding box
+    dim_y = y_min - offset
+    dim_x = x_min - offset
+
+    # Generate the OpenSCAD helper modules and wrapper code
+    scad_content = f"""// Auto-generated dimensioned wrapper
+part = "{part_name}";
+
+module draw_dim_x(x1, x2, y, label, font_size) {{
+    t = 0.3; // line thickness
+    tick = 3.0; // tick mark length
+    
+    // Horizontal dimension line
+    translate([x1, y - t/2]) square([x2 - x1, t]);
+    
+    // Extension lines (Z=0 down to Z=y)
+    translate([x1, y]) square([t, abs(y)]);
+    translate([x2, y]) square([t, abs(y)]);
+    
+    // Tick marks (45 degrees)
+    translate([x1, y]) rotate([0, 0, 45]) square([t, tick], center=True);
+    translate([x2, y]) rotate([0, 0, 45]) square([t, tick], center=True);
+    
+    // Label
+    translate([(x1 + x2)/2, y + 1.5]) text(label, size=font_size, halign="center", valign="bottom");
+}}
+
+module draw_dim_y(y1, y2, x, label, font_size) {{
+    t = 0.3; // line thickness
+    tick = 3.0; // tick mark length
+    
+    // Vertical dimension line
+    translate([x - t/2, y1]) square([t, y2 - y1]);
+    
+    // Extension lines (X=0 left to X=x)
+    translate([x, y1]) square([abs(x), t]);
+    translate([x, y2]) square([abs(x), t]);
+    
+    // Tick marks
+    translate([x, y1]) rotate([0, 0, 45]) square([t, tick], center=True);
+    translate([x, y2]) rotate([0, 0, 45]) square([t, tick], center=True);
+    
+    // Label
+    translate([x - 1.5, (y1 + y2)/2]) rotate([0, 0, 90]) text(label, size=font_size, halign="center", valign="bottom");
+}}
+
+// Include original model
+include <{os.path.abspath(scad_path)}>
+
+// Overlay dimensions
+draw_dim_x({x_min}, {x_max}, {dim_y}, "{label_x_esc}", {font_size_x});
+draw_dim_y({y_min}, {y_max}, {dim_x}, "{label_y_esc}", {font_size_y});
+"""
+
+    # 3. Write temporary wrapper SCAD file and render it
+    temp_wrapper_scad = os.path.join(os.path.dirname(output_path) or ".", f"temp_dim_{part_name}.scad")
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    with open(temp_wrapper_scad, "w") as f:
+        f.write(scad_content)
+
+    try:
+        # Run OpenSCAD to compile the wrapper SCAD to output_path (DXF/SVG)
+        cmd_args = [
+            "-D", f'part="{part_name}"',
+            "-o", output_path,
+            temp_wrapper_scad
+        ]
+        run_openscad(cmd_args)
+    finally:
+        if os.path.exists(temp_wrapper_scad):
+            os.remove(temp_wrapper_scad)
+
+    if not os.path.exists(output_path):
+        raise RuntimeError(f"Failed to generate dimensioned output file at '{output_path}'.")
+
+    size_bytes = os.path.getsize(output_path)
+    size_kb = size_bytes / 1024.0
+
+    return f"Successfully generated dimensioned 2D template at '{output_path}' ({size_kb:.2f} KB)."
 
 if __name__ == "__main__":
     mcp.run()
