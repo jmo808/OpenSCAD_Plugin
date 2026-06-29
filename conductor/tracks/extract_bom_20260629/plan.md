@@ -40,16 +40,16 @@
 
 ## Phase 2: Aggregation & Grouping Engine
 
-- [~] Task: Write tests for BOM aggregation and grouping
-    - [ ] Write test: aggregates identical items (same name + category) and sums quantities
-    - [ ] Write test: case-insensitive name matching ("M3x12 Screw" == "m3x12 screw")
-    - [ ] Write test: groups entries by category
-    - [ ] Write test: sorts entries alphabetically by name within each category
-    - [ ] Write test: preserves supplier and part_number from first occurrence
-    - [ ] Write test: computes correct `total_unique_items` and `total_quantity`
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [0168959] Task: Write tests for BOM aggregation and grouping
+    - [x] Write test: aggregates identical items (same name + category) and sums quantities
+    - [x] Write test: case-insensitive name matching ("M3x12 Screw" == "m3x12 screw")
+    - [x] Write test: groups entries by category
+    - [x] Write test: sorts entries alphabetically by name within each category
+    - [x] Write test: preserves supplier and part_number from first occurrence
+    - [x] Write test: computes correct `total_unique_items` and `total_quantity`
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement BOM aggregation engine
+- [~] Task: Implement BOM aggregation engine
     - [ ] Add `aggregate_bom(entries: list[dict]) -> dict` to `bom_parser.py`
     - [ ] Implement case-insensitive grouping key: `(name.lower(), category.lower())`
     - [ ] Sum `qty` across duplicates, keep first `supplier` and `part_number`
