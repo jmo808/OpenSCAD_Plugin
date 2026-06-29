@@ -26,7 +26,7 @@
     - [ ] Write test: handles single-part SCAD files correctly
     - [ ] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement SCAD part name discovery
+- [x] [6293a19] Task: Implement SCAD part name discovery
     - [ ] Create `scad_utils.py` module with `discover_parts(scad_path: str) -> list[str]` function
     - [ ] Use regex to extract part names from `if (part == "...")` and `} else if (part == "...")` patterns
     - [ ] Run tests and confirm they all pass (Green phase)
