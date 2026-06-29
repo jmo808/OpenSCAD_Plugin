@@ -48,15 +48,15 @@
     - [x] Write test: multi-sheet allocation works correctly
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement FFD packing algorithm
-    - [ ] Add `pack_ffd(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
-    - [ ] Sort panels by area (largest first)
-    - [ ] For each panel, try both orientations and place in first available position
-    - [ ] Calculate `utilization_percent` and `waste_area_mm2` per sheet
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(nesting): Implement FFD (optimized) packing algorithm`
+- [x] [50e689a] Task: Implement FFD packing algorithm
+    - [x] Add `pack_ffd(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) -> list[dict]` to `nesting.py`
+    - [x] Sort panels by area (largest first)
+    - [x] For each panel, try both orientations and place in first available position
+    - [x] Calculate `utilization_percent` and `waste_area_mm2` per sheet
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(nesting): Implement FFD (optimized) packing algorithm`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Packing Algorithms' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Packing Algorithms' (Protocol in workflow.md)
 
 ## Phase 3: Visual Layout Rendering
 
