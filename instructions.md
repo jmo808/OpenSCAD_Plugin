@@ -59,6 +59,16 @@ Renders a single combined quadrant image containing front, side, top, and isomet
   - `colorscheme` (string, default "Sunset"): Rendering color scheme.
   - `views` (array of strings, optional): Custom list of up to 4 views to render. Defaults to ['front', 'right', 'top', 'isometric'].
 
+### 7. `check_interference`
+Detects and reports geometric intersections (collisions) between components in an OpenSCAD assembly model. It performs 3D CSG intersections to compute volume overlap and exports a PNG visual highlight showing collisions in red against a semi-transparent assembly.
+- **When to use:** Use this tool to verify assembly clearance and identify mechanical collisions, overlaps, or improper fits between parts before fabrication.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `fail_fast` (boolean, default false): If true, halts checking after the first collision is found.
+  - `img_size` (number, default 512): Resolution of the visual highlight PNG preview.
+  - `colorscheme` (string, default "Sunset"): Rendering color scheme.
+  - `output_path` (string, optional): Optional path to save the highlight PNG. Defaults to `<scad_dir>/<scad_basename>_interference.png`.
+
 ## Environment Variables
 - `OPENSCAD_BINARY_PATH`: Path to the OpenSCAD command-line executable. Defaults to `/home/jules/.local/bin/openscad`.
 - `OPENSCAD_DEFAULT_TOLERANCE`: Default design tolerance (for clearances/fits). Defaults to `0.05`.
