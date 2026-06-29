@@ -6,7 +6,9 @@ import json
 import re
 from PIL import Image as PILImage, ImageDraw as PILImageDraw
 from mcp.server.fastmcp import FastMCP, Image
-from scad_utils import discover_parts
+from scad_utils import discover_parts, get_openscad_binary, validate_scad_path, run_openscad
+from interference import run_pairwise_check, render_collision_highlight
+import base64
 
 # Initialize the FastMCP server
 mcp = FastMCP("openscad-mcp")
@@ -15,36 +17,6 @@ mcp = FastMCP("openscad-mcp")
 OPENSCAD_BINARY_PATH = os.getenv("OPENSCAD_BINARY_PATH", "/home/jules/.local/bin/openscad")
 OPENSCAD_DEFAULT_TOLERANCE = float(os.getenv("OPENSCAD_DEFAULT_TOLERANCE", "0.05"))
 
-def get_openscad_binary() -> str:
-    """Detects and returns the path to the OpenSCAD executable."""
-    binary = os.getenv("OPENSCAD_BINARY_PATH", OPENSCAD_BINARY_PATH)
-    if os.path.exists(binary) and os.access(binary, os.X_OK):
-        return binary
-    
-    # Try finding in system PATH
-    system_bin = shutil.which("openscad") or shutil.which("openscad-nightly")
-    if system_bin:
-        return system_bin
-        
-    raise FileNotFoundError(
-        f"OpenSCAD binary not found at '{binary}' and was not found in system PATH. "
-        "Please install OpenSCAD or configure the OPENSCAD_BINARY_PATH environment variable."
-    )
-
-def validate_scad_path(path: str) -> str:
-    """Validates that the file path exists and returns its absolute path."""
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"OpenSCAD file not found at: '{path}'")
-    return os.path.abspath(path)
-
-def run_openscad(args: list) -> subprocess.CompletedProcess:
-    """Executes the OpenSCAD binary with the given arguments."""
-    openscad_bin = get_openscad_binary()
-    cmd = [openscad_bin] + args
-    try:
-        return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"OpenSCAD execution failed for command {cmd}:\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}")
 
 @mcp.tool()
 def generate_scad(scad_code: str, output_path: str, parameters: dict = None) -> str:
@@ -625,6 +597,82 @@ def generate_multiview(
     img_content = Image(data=img_bytes, format="png").to_image_content()
     
     return [text_content, img_content]
+
+@mcp.tool()
+def check_interference(
+    scad_path: str,
+    fail_fast: bool = False,
+    img_size: int = 512,
+    colorscheme: str = "Sunset",
+    output_path: str = None
+) -> list:
+    """Detects and reports geometric intersections (collisions) between components in an OpenSCAD assembly model.
+
+    Args:
+        scad_path: Path to the source .scad file.
+        fail_fast: If True, halts checking after the first collision is found.
+        img_size: Resolution of the visual highlight PNG preview.
+        colorscheme: OpenSCAD rendering colorscheme.
+        output_path: Optional path to save the highlight PNG. If not specified, saves to <scad_dir>/<scad_basename>_interference.png.
+
+    Returns:
+        A list of MCP content blocks (summary, optional PNG preview, and JSON collision data).
+    """
+    validate_scad_path(scad_path)
+    
+    # 1. Discover all part names
+    parts = discover_parts(scad_path)
+    if not parts:
+        summary_text = "No components discovered in the SCAD file. Interference checking skipped."
+        return [{"type": "text", "text": summary_text}, {"type": "text", "text": "[]"}]
+        
+    # 2. Run pairwise collision detection
+    collisions = run_pairwise_check(scad_path, parts, fail_fast=fail_fast)
+    
+    # Format JSON block
+    json_text = json.dumps(collisions, indent=2)
+    json_block = {"type": "text", "text": json_text}
+    
+    if not collisions:
+        summary_text = f"Great news! All {len(parts)} components passed interference checking — no collisions detected."
+        return [{"type": "text", "text": summary_text}, json_block]
+        
+    # Formatting human-readable summary
+    summary_lines = [
+        f"Interference check complete: {len(collisions)} collision(s) detected between {len(parts)} components."
+    ]
+    for c in collisions:
+        summary_lines.append(
+            f"- {c['part_a']} <-> {c['part_b']}: overlap of {c['intersection_volume_mm3']:.4f} mm³"
+        )
+        
+    # 3. Determine output path for highlight PNG
+    if output_path is None:
+        scad_dir = os.path.dirname(os.path.abspath(scad_path))
+        scad_base = os.path.splitext(os.path.basename(scad_path))[0]
+        output_path = os.path.join(scad_dir, f"{scad_base}_interference.png")
+    else:
+        output_path = os.path.abspath(output_path)
+        
+    summary_lines.append(f"Visual collision highlight saved to: '{output_path}'")
+    summary_text = "\n".join(summary_lines)
+    summary_block = {"type": "text", "text": summary_text}
+    
+    # 4. Generate visual highlight PNG
+    try:
+        img_b64 = render_collision_highlight(
+            scad_path,
+            collisions,
+            output_path=output_path,
+            img_size=img_size,
+            colorscheme=colorscheme
+        )
+        img_bytes = base64.b64decode(img_b64.encode("utf-8"))
+        img_content = Image(data=img_bytes, format="png").to_image_content()
+        return [summary_block, img_content, json_block]
+    except Exception as e:
+        warning_text = summary_text + f"\n\nWarning: Failed to render visual highlight: {str(e)}"
+        return [{"type": "text", "text": warning_text}, json_block]
 
 if __name__ == "__main__":
     mcp.run()

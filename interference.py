@@ -39,7 +39,7 @@ def check_pair(scad_path: str, part_a: str, part_b: str) -> dict | None:
             run_openscad(["-D", f'part="{part_a}"', "-o", part_a_stl, scad_path])
             part_a_exists = True
         except RuntimeError as e:
-            if "Current top level object is empty" in str(e):
+            if "Current top level object is empty" in str(e) or "Current top level object is not a 3D object" in str(e):
                 part_a_exists = False
             else:
                 raise
@@ -49,12 +49,12 @@ def check_pair(scad_path: str, part_a: str, part_b: str) -> dict | None:
             run_openscad(["-D", f'part="{part_b}"', "-o", part_b_stl, scad_path])
             part_b_exists = True
         except RuntimeError as e:
-            if "Current top level object is empty" in str(e):
+            if "Current top level object is empty" in str(e) or "Current top level object is not a 3D object" in str(e):
                 part_b_exists = False
             else:
                 raise
                 
-        # If either part is empty, there is no collision
+        # If either part is empty or 2D, there is no 3D collision volume
         if not part_a_exists or not part_b_exists:
             return None
         
@@ -67,7 +67,7 @@ def check_pair(scad_path: str, part_a: str, part_b: str) -> dict | None:
         try:
             run_openscad(["-o", wrapper_stl_path, wrapper_scad_path])
         except RuntimeError as e:
-            if "Current top level object is empty" in str(e):
+            if "Current top level object is empty" in str(e) or "Current top level object is not a 3D object" in str(e):
                 return None
             raise
         
@@ -161,7 +161,7 @@ def render_collision_highlight(
         try:
             run_openscad(["-D", 'part="all"', "-o", assembly_stl, scad_path])
         except RuntimeError as e:
-            if "Current top level object is empty" in str(e):
+            if "Current top level object is empty" in str(e) or "Current top level object is not a 3D object" in str(e):
                 with open(assembly_stl, "wb") as f:
                     f.write(b"\x00" * 84)
             else:
