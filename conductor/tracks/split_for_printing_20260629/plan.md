@@ -33,13 +33,13 @@
     - [x] Write test: finger count and dimensions are configurable
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement dovetail joint generator
-    - [ ] Add `generate_dovetail_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
-    - [ ] Generate OpenSCAD code for male (protruding) and female (recessed) dovetail geometry
-    - [ ] Apply clearance to female side
-    - [ ] Return SCAD code strings for union with each half
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement dovetail joint generator`
+- [x] [d5146e7] Task: Implement dovetail joint generator
+    - [x] Add `generate_dovetail_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
+    - [x] Generate OpenSCAD code for male (protruding) and female (recessed) dovetail geometry
+    - [x] Apply clearance to female side
+    - [x] Return SCAD code strings for union with each half
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement dovetail joint generator`
 
 - [ ] Task: Write tests for flange joint generator
     - [ ] Write test: generates overlapping tab geometry with correct dimensions
