@@ -393,7 +393,7 @@ def test_nest_panels_tool_simple(sample_scad_file, local_tmp_path):
 
 def test_split_for_printing_tool_auto(local_tmp_path):
     from server import split_for_printing
-    scad_content = "module large_part() { cube([300, 150, 400]); }\nlarge_part();"
+    scad_content = "module large_part() { cube([150, 150, 400]); }\nlarge_part();"
     scad_path = os.path.join(local_tmp_path, "large_part.scad")
     with open(scad_path, "w") as f:
         f.write(scad_content)
@@ -422,7 +422,7 @@ def test_split_for_printing_tool_auto(local_tmp_path):
 
 def test_split_for_printing_tool_manual(local_tmp_path):
     from server import split_for_printing
-    scad_content = "module large_part() { cube([300, 150, 400]); }\nlarge_part();"
+    scad_content = "module large_part() { cube([150, 150, 400]); }\nlarge_part();"
     scad_path = os.path.join(local_tmp_path, "large_part.scad")
     with open(scad_path, "w") as f:
         f.write(scad_content)

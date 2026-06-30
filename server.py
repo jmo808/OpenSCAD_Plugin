@@ -813,5 +813,153 @@ def nest_panels(
         
     return result_list
 
+@mcp.tool()
+def split_for_printing(
+    scad_path: str,
+    part_name: str | None = None,
+    bed_width: float = 220.0,
+    bed_depth: float = 220.0,
+    bed_height: float = 250.0,
+    safety_margin: float = 10.0,
+    split_axis: str = "auto",
+    joint_type: str = "auto",
+    manual_coordinate: float | None = None,
+    joint_configs: dict | None = None,
+    output_dir: str | None = None
+) -> list:
+    """Splits a large 3D part into segments fitting the specified printer bed.
+
+    Args:
+        scad_path: Path to the .scad source file.
+        part_name: Optional name of the part (module) to split.
+        bed_width: Printer bed width in X (mm).
+        bed_depth: Printer bed depth in Y (mm).
+        bed_height: Printer bed height in Z (mm).
+        safety_margin: Subtracted from bed dimensions for safety margin (mm).
+        split_axis: Axis to split on ("x", "y", "z", or "auto").
+        joint_type: Joint type to use ("dovetail", "flange", "tongue_groove", "pin", or "auto").
+        manual_coordinate: Coordinate to split at (for manual single split).
+        joint_configs: Optional overrides for specific joints.
+        output_dir: Optional directory to save segments to.
+
+    Returns:
+        A list of FastMCP content elements: [text_summary, JSON_metadata, optional_image].
+    """
+    from splitting import (
+        get_part_bbox,
+        calculate_split_planes,
+        validate_manual_split,
+        split_part,
+        generate_exploded_scad
+    )
+    
+    validate_scad_path(scad_path)
+    
+    # 1. Get bounding box
+    bbox = get_part_bbox(scad_path, part_name)
+    
+    bed_dims = [bed_width, bed_depth, bed_height]
+    
+    # 2. Determine split planes
+    if manual_coordinate is not None:
+        if split_axis == "auto":
+            raise ValueError("Must specify an explicit split_axis ('x', 'y', or 'z') when manual_coordinate is provided.")
+        split_planes = [validate_manual_split(bbox, split_axis, manual_coordinate)]
+    else:
+        split_planes = calculate_split_planes(bbox, bed_width, bed_depth, bed_height, safety_margin)
+        
+    # 3. Handle joint configurations overrides
+    configs = {}
+    if joint_configs:
+        configs = dict(joint_configs)
+        
+    if joint_type != "auto":
+        for ax in ["x", "y", "z"]:
+            if ax not in configs:
+                configs[ax] = {}
+            configs[ax]["joint_type"] = joint_type
+            
+    # 4. Run split_part
+    if not output_dir:
+        output_dir = os.path.dirname(os.path.abspath(scad_path))
+    os.makedirs(output_dir, exist_ok=True)
+    
+    segments = split_part(
+        scad_path=scad_path,
+        part_name=part_name,
+        split_planes=split_planes,
+        joint_configs=configs if configs else None,
+        output_dir=output_dir
+    )
+    
+    # 5. Generate exploded preview SCAD
+    exploded_scad = generate_exploded_scad(
+        scad_path=scad_path,
+        part_name=part_name,
+        split_planes=split_planes,
+        joint_configs=configs if configs else None,
+        offset=20.0
+    )
+    
+    p_name = part_name if part_name else "model"
+    exploded_scad_path = os.path.abspath(os.path.join(output_dir, f"{p_name}_exploded.scad"))
+    with open(exploded_scad_path, "w") as f:
+        f.write(exploded_scad)
+        
+    # Render exploded preview PNG
+    preview_path = os.path.abspath(os.path.join(output_dir, f"{p_name}_exploded.png"))
+    cmd_args = [
+        "-o", preview_path,
+        "--imgsize", "512,512",
+        "--projection", "o",
+        "--autocenter",
+        "--viewall",
+        "--camera=0,0,0,55,0,45,0",
+        exploded_scad_path
+    ]
+    
+    img_content = None
+    try:
+        run_openscad(cmd_args)
+        if os.path.exists(preview_path):
+            with open(preview_path, "rb") as f:
+                img_bytes = f.read()
+            img_content = Image(data=img_bytes, format="png").to_image_content()
+    except Exception:
+        pass
+        
+    # Construct response
+    summary = (
+        f"Successfully split '{p_name}' into {len(segments)} segments.\n"
+        f"Output directory: {output_dir}\n"
+        f"Split plane(s) calculated: {split_planes}\n"
+        f"Exploded preview saved to: {exploded_scad_path}\n\n"
+        f"Segments:\n"
+    )
+    for seg in segments:
+        summary += (
+            f"  - {seg['name']}:\n"
+            f"    * STL path: {seg['stl_path']}\n"
+            f"    * Dimensions: {seg['dimensions_mm']}\n"
+            f"    * Joint: {seg['joint_type']} on face {seg['joint_face']}\n"
+        )
+        
+    text_content = {"type": "text", "text": summary}
+    
+    structured_json = json.dumps({
+        "status": "success",
+        "part_name": p_name,
+        "split_planes": split_planes,
+        "exploded_scad_path": exploded_scad_path,
+        "segments": segments
+    }, indent=2)
+    json_content = {"type": "text", "text": structured_json}
+    
+    result_list = [text_content, json_content]
+    if img_content:
+        result_list.append(img_content)
+        
+    return result_list
+
 if __name__ == "__main__":
     mcp.run()
