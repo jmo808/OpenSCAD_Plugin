@@ -280,3 +280,101 @@ def generate_flange_scad(
 }}"""
 
     return male_scad, female_scad
+
+def generate_tongue_groove_scad(
+    face_width: float,
+    face_height: float,
+    params: dict | None = None
+) -> tuple[str, str]:
+    """Generates OpenSCAD code for tongue-and-groove alignment joints.
+
+    Args:
+        face_width: Width of the cut interface face (mm).
+        face_height: Height of the cut interface face (mm).
+        params: Dictionary of joint parameters:
+          {tongue_width, tongue_depth, clearance}.
+
+    Returns:
+        A tuple of (male_scad, female_scad) strings.
+    """
+    if params is None:
+        params = {}
+    t_width = params.get("tongue_width", 5.0)
+    t_depth = params.get("tongue_depth", 3.0)
+    clearance = params.get("clearance", 0.2)
+    
+    # Male tongue (protruding ridge)
+    male_scad = f"""union() {{
+    if ($children > 0) children(0);
+    translate([-{(face_width + 0.1)/2:.4f}, -{t_width/2:.4f}, 0])
+        cube([{face_width + 0.1:.4f}, {t_width:.4f}, {t_depth:.4f}]);
+}}"""
+
+    # Female groove (pocket with clearance)
+    female_scad = f"""difference() {{
+    if ($children > 0) children(0);
+    translate([-{(face_width + 0.2)/2:.4f}, -{(t_width + 2*clearance)/2:.4f}, -0.1])
+        cube([{face_width + 0.2:.4f}, {t_width + 2*clearance:.4f}, {t_depth + clearance + 0.1:.4f}]);
+}}"""
+
+    return male_scad, female_scad
+
+def generate_pin_scad(
+    face_width: float,
+    face_height: float,
+    params: dict | None = None
+) -> tuple[str, str]:
+    """Generates OpenSCAD code for pin alignment holes.
+
+    Args:
+        face_width: Width of the cut interface face (mm).
+        face_height: Height of the cut interface face (mm).
+        params: Dictionary of joint parameters:
+          {pin_diameter, pin_depth, pin_count, clearance}.
+
+    Returns:
+        A tuple of (male_scad, female_scad) strings.
+    """
+    if params is None:
+        params = {}
+    pin_diam = params.get("pin_diameter", 4.0)
+    pin_depth = params.get("pin_depth", 6.0)
+    pin_count = params.get("pin_count", 2)
+    clearance = params.get("clearance", 0.2)
+    
+    holes_male = []
+    holes_female = []
+    
+    for i in range(pin_count):
+        x_pos = -face_width / 2.0 + (i + 0.5) * (face_width / pin_count)
+        
+        # Male holes: Nominal diameter and depth, cutting downwards
+        holes_male.append(
+            f"translate([{x_pos:.4f}, 0, -{pin_depth:.4f}]) "
+            f"cylinder(d={pin_diam:.4f}, h={pin_depth + 0.1:.4f}, $fn=32);"
+        )
+        
+        # Female holes: Enlarged diameter and depth, cutting upwards
+        holes_female.append(
+            f"translate([{x_pos:.4f}, 0, -0.1]) "
+            f"cylinder(d={pin_diam + clearance:.4f}, h={pin_depth + clearance + 0.1:.4f}, $fn=32);"
+        )
+        
+    holes_male_str = "\n        ".join(holes_male)
+    holes_female_str = "\n        ".join(holes_female)
+    
+    male_scad = f"""difference() {{
+    if ($children > 0) children(0);
+    union() {{
+        {holes_male_str}
+    }}
+}}"""
+
+    female_scad = f"""difference() {{
+    if ($children > 0) children(0);
+    union() {{
+        {holes_female_str}
+    }}
+}}"""
+
+    return male_scad, female_scad

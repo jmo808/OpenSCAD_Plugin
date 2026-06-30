@@ -342,6 +342,11 @@ def test_tongue_groove_scad_generation():
     male_scad, female_scad = generate_tongue_groove_scad(face_width=50.0, face_height=10.0, params=params)
     assert isinstance(male_scad, str) and len(male_scad) > 0
     assert isinstance(female_scad, str) and len(female_scad) > 0
+    
+    # Test with params=None to ensure defaults are used
+    male_def, female_def = generate_tongue_groove_scad(face_width=50.0, face_height=10.0)
+    assert isinstance(male_def, str) and len(male_def) > 0
+    assert isinstance(female_def, str) and len(female_def) > 0
 
 def test_tongue_groove_clearance(local_tmp_path):
     from splitting import generate_tongue_groove_scad
@@ -406,6 +411,11 @@ def test_pin_scad_generation():
     male_scad, female_scad = generate_pin_scad(face_width=50.0, face_height=10.0, params=params)
     assert isinstance(male_scad, str) and len(male_scad) > 0
     assert isinstance(female_scad, str) and len(female_scad) > 0
+    
+    # Test with params=None to ensure defaults are used
+    male_def, female_def = generate_pin_scad(face_width=50.0, face_height=10.0)
+    assert isinstance(male_def, str) and len(male_def) > 0
+    assert isinstance(female_def, str) and len(female_def) > 0
 
 def test_pin_clearance(local_tmp_path):
     from splitting import generate_pin_scad
