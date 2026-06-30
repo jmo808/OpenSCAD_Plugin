@@ -629,6 +629,33 @@ def test_split_part_invalid_stl(local_tmp_path, oversized_scad_file):
         except FileNotFoundError:
             pytest.skip("OpenSCAD binary not available")
 
+def test_generate_exploded_scad(local_tmp_path, oversized_scad_file):
+    from splitting import generate_exploded_scad
+    
+    split_planes = [{"axis": "z", "coordinate": 200.0}]
+    try:
+        scad_code = generate_exploded_scad(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes,
+            joint_configs=None,
+            offset=30.0
+        )
+        assert isinstance(scad_code, str)
+        assert "translate" in scad_code
+        assert "oversized_box" in scad_code
+        
+        # Test default offset
+        scad_code_def = generate_exploded_scad(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes
+        )
+        assert "translate" in scad_code_def
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+
 
 
 
