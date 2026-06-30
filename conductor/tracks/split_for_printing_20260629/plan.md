@@ -22,9 +22,9 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement split plane calculation and bounding box extraction`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Split Plane Calculation' (Protocol in workflow.md)
+- [x] [28e1bda] Task: Conductor - User Manual Verification 'Phase 1: Split Plane Calculation' (Protocol in workflow.md)
 
-## Phase 2: Joining Mechanism Generators
+## Phase 2: Joining Mechanism Generators [checkpoint: af5b37c]
 
 - [x] [0b863d1] Task: Write tests for dovetail joint generator
     - [x] Write test: generates valid OpenSCAD code for dovetail fingers on a flat face
@@ -67,7 +67,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement tongue-groove and pin joint generators`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
+- [x] [af5b37c] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
 
 ## Phase 3: Part Splitting Engine & STL Export
 
