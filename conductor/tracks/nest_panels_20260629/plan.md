@@ -80,17 +80,17 @@
 
 ## Phase 4: MCP Tool Integration & Documentation
 
-- [~] Task: Write tests for `nest_panels` MCP tool
-    - [ ] Write test: tool is registered and appears in MCP schema
-    - [ ] Write test: returns structured JSON matching the schema for a valid SCAD file
-    - [ ] Write test: returns human-readable summary with file paths and utilization
-    - [ ] Write test: returns inline base64 PNG layout image
-    - [ ] Write test: `strategy="simple"` uses shelf algorithm
-    - [ ] Write test: `strategy="optimized"` uses FFD algorithm
-    - [ ] Write test: custom `sheet_width` and `sheet_height` override preset
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [3648261] Task: Write tests for `nest_panels` MCP tool
+    - [x] Write test: tool is registered and appears in MCP schema
+    - [x] Write test: returns structured JSON matching the schema for a valid SCAD file
+    - [x] Write test: returns human-readable summary with file paths and utilization
+    - [x] Write test: returns inline base64 PNG layout image
+    - [x] Write test: `strategy="simple"` uses shelf algorithm
+    - [x] Write test: `strategy="optimized"` uses FFD algorithm
+    - [x] Write test: custom `sheet_width` and `sheet_height` override preset
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `nest_panels` MCP tool
+- [~] Task: Implement `nest_panels` MCP tool
     - [ ] Add `@mcp.tool()` decorated `nest_panels` function to `server.py`
     - [ ] Wire up panel extraction, packing algorithm selection, and layout rendering
     - [ ] Build structured JSON response matching the schema
