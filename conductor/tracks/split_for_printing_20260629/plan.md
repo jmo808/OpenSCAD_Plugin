@@ -14,13 +14,13 @@
     - [x] Write test: raises error if part already fits within bed (no split needed)
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement split plane calculator
-    - [ ] Create `splitting.py` module
-    - [ ] Implement `get_part_bbox(scad_path, part_name) -> dict` using OpenSCAD STL export + vertex parsing (reuse `stl_utils.py` bounding box extractor)
-    - [ ] Implement `calculate_split_planes(bbox, bed_x, bed_y, bed_z, margin) -> list[dict]` for auto mode
-    - [ ] Implement `validate_manual_split(bbox, axis, coord) -> dict` for manual mode
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement split plane calculation and bounding box extraction`
+- [x] [5cfc3ab] Task: Implement split plane calculator
+    - [x] Create `splitting.py` module
+    - [x] Implement `get_part_bbox(scad_path, part_name) -> dict` using OpenSCAD STL export + vertex parsing (reuse `stl_utils.py` bounding box extractor)
+    - [x] Implement `calculate_split_planes(bbox, bed_x, bed_y, bed_z, margin) -> list[dict]` for auto mode
+    - [x] Implement `validate_manual_split(bbox, axis, coord) -> dict` for manual mode
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement split plane calculation and bounding box extraction`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Split Plane Calculation' (Protocol in workflow.md)
 
