@@ -344,7 +344,7 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
     img_h = sheet_display_h + 2 * padding
     
     # Create dark slate background image
-    img = PILImage.new("RGB", (img_w, img_h), "#0f172a")
+    img = PILImage.new("RGB", (img_w, img_h), "white")
     draw = PILImageDraw.Draw(img)
     
     # Load fonts
@@ -364,8 +364,8 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
     # Draw sheet background and border
     draw.rectangle(
         [ox, oy, ox + sheet_display_w, oy + sheet_display_h],
-        fill="#1e293b",
-        outline="#0ea5e9",
+        fill="lightgray",
+        outline="black",
         width=2
     )
     
@@ -388,8 +388,8 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
         # Draw panel rect
         draw.rectangle(
             [x_px, y_px, x_px + w_px, y_px + h_px],
-            fill="#0284c7",
-            outline="#38bdf8",
+            fill="darkgray",
+            outline="black",
             width=2
         )
         
@@ -415,14 +415,14 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
             
             tx2 = x_px + (w_px - w2) // 2
             ty2 = ty1 + h1 + 4
-            draw.text((tx2, ty2), text_line2, fill="#e0f2fe", font=font_small)
+            draw.text((tx2, ty2), text_line2, fill="white", font=font_small)
         elif w_px >= 30 and h_px >= 15:
             draw.text((x_px + 3, y_px + 3), text_line1[:8], fill="white", font=font_small)
             
     # Draw dimension labels outside sheet
     # 1. Title at top
     title_text = f"Sheet {sheet_num} Layout (Util: {util}%)"
-    draw.text((20, 15), title_text, fill="#f8fafc", font=font_large)
+    draw.text((20, 15), title_text, fill="black", font=font_large)
     
     # 2. Width label (bottom)
     w_text = f"{sheet_w} mm"
@@ -431,7 +431,7 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
         ww = bw[2] - bw[0]
     except AttributeError:
         ww = draw.textsize(w_text, font=font)[0] if hasattr(draw, "textsize") else 8 * len(w_text)
-    draw.text((ox + (sheet_display_w - ww) // 2, oy + sheet_display_h + 10), w_text, fill="#94a3b8", font=font)
+    draw.text((ox + (sheet_display_w - ww) // 2, oy + sheet_display_h + 10), w_text, fill="red", font=font)
     
     # 3. Height label (left)
     h_text = f"{sheet_h} mm"
@@ -440,7 +440,7 @@ def render_layout_png(sheet: dict, output_path: str, img_size: int = 800) -> byt
         wh, hh = bh[2] - bh[0], bh[3] - bh[1]
     except AttributeError:
         wh, hh = draw.textsize(h_text, font=font) if hasattr(draw, "textsize") else (8 * len(h_text), 12)
-    draw.text((ox - wh - 10, oy + (sheet_display_h - hh) // 2), h_text, fill="#94a3b8", font=font)
+    draw.text((ox - wh - 10, oy + (sheet_display_h - hh) // 2), h_text, fill="red", font=font)
     
     # Save file
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
