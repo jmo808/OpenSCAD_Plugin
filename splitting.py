@@ -181,3 +181,102 @@ def generate_dovetail_scad(
     female_scad = "union() {\n    " + "\n    ".join(translates_female) + "\n}"
     
     return male_scad, female_scad
+
+def generate_flange_scad(
+    face_width: float,
+    face_height: float,
+    params: dict | None = None
+) -> tuple[str, str]:
+    """Generates OpenSCAD code for overlapping flange tabs with screw and nut holes.
+
+    Args:
+        face_width: Width of the cut interface face (mm).
+        face_height: Height of the cut interface face (mm).
+        params: Dictionary of joint parameters:
+          {flange_width, flange_thickness, screw_size, screw_count, clearance}.
+
+    Returns:
+        A tuple of (male_scad, female_scad) strings.
+    """
+    if params is None:
+        params = {}
+    flange_width = params.get("flange_width", 20.0)
+    flange_thickness = params.get("flange_thickness", 5.0)
+    screw_size = params.get("screw_size", "M3")
+    screw_count = params.get("screw_count", 2)
+    clearance = params.get("clearance", 0.2)
+    
+    # Fastener dimensions
+    screw_dims = {
+        "M2": {"shaft": 2.2, "head": 4.0, "nut": 4.5},
+        "M3": {"shaft": 3.2, "head": 6.0, "nut": 6.4},
+        "M4": {"shaft": 4.2, "head": 8.0, "nut": 8.1}
+    }
+    dims = screw_dims.get(screw_size.upper(), screw_dims["M3"])
+    
+    sh_m = dims["shaft"]
+    hd_m = dims["head"]
+    
+    sh_f = dims["shaft"] + clearance
+    nt_f = dims["nut"] + clearance
+    
+    t = flange_thickness
+    w = flange_width
+    
+    # Generate translates for screw holes
+    screw_holes_male = []
+    screw_holes_female = []
+    
+    for i in range(screw_count):
+        x_pos = -face_width / 2.0 + (i + 0.5) * (face_width / screw_count)
+        
+        # Male screw: shaft and head counterbore
+        # Head counterbore is at Z = -t to Z = -t/2
+        screw_holes_male.append(
+            f"translate([{x_pos:.4f}, 0, -{t:.4f} - 0.1]) "
+            f"cylinder(d={sh_m:.4f}, h={2*t + 0.2:.4f}, $fn=16);"
+        )
+        screw_holes_male.append(
+            f"translate([{x_pos:.4f}, 0, -{t:.4f} - 0.1]) "
+            f"cylinder(d={hd_m:.4f}, h={t/2 + 0.1:.4f}, $fn=16);"
+        )
+        
+        # Female screw: shaft and hex nut trap
+        # Nut trap is at the back (Z = t to Z = 2t), say Z = 1.5t to 2t
+        screw_holes_female.append(
+            f"translate([{x_pos:.4f}, 0, -0.1]) "
+            f"cylinder(d={sh_f:.4f}, h={2*t + 0.2:.4f}, $fn=16);"
+        )
+        screw_holes_female.append(
+            f"translate([{x_pos:.4f}, 0, {1.5*t:.4f}]) "
+            f"cylinder(d={nt_f:.4f}, h={t/2 + 0.1:.4f}, $fn=6);"
+        )
+        
+    holes_male_str = "\n        ".join(screw_holes_male)
+    holes_female_str = "\n        ".join(screw_holes_female)
+    
+    # Male: wrapper that adds tab and subtracts screw head holes
+    male_scad = f"""difference() {{
+    union() {{
+        if ($children > 0) children(0);
+        translate([-{face_width/2:.4f}, -{w/2:.4f}, 0])
+            cube([{face_width:.4f}, {w:.4f}, {t:.4f}]);
+    }}
+    union() {{
+        {holes_male_str}
+    }}
+}}"""
+
+    # For female, the pocket is subtracted, and the nut traps are subtracted
+    female_scad = f"""difference() {{
+    if ($children > 0) children(0);
+    union() {{
+        // Overlap pocket to be subtracted
+        translate([-{face_width/2 + 0.1:.4f}, -{w/2 + clearance:.4f}, -0.1])
+            cube([{face_width + 0.2:.4f}, {w + 2*clearance:.4f}, {t + clearance + 0.1:.4f}]);
+        // Screw holes and nut traps
+        {holes_female_str}
+    }}
+}}"""
+
+    return male_scad, female_scad

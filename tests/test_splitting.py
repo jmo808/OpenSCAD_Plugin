@@ -248,6 +248,11 @@ def test_flange_scad_generation():
     male_scad, female_scad = generate_flange_scad(face_width=50.0, face_height=10.0, params=params)
     assert isinstance(male_scad, str) and len(male_scad) > 0
     assert isinstance(female_scad, str) and len(female_scad) > 0
+    
+    # Test with params=None to ensure defaults are used
+    male_def, female_def = generate_flange_scad(face_width=50.0, face_height=10.0)
+    assert isinstance(male_def, str) and len(male_def) > 0
+    assert isinstance(female_def, str) and len(female_def) > 0
 
 def test_flange_screw_configurability():
     from splitting import generate_flange_scad
