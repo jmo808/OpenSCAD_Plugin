@@ -98,13 +98,13 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement nest_panels MCP tool`
 
-- [~] Task: Update documentation and installer
-    - [ ] Update `instructions.md` with `nest_panels` tool documentation
-    - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
-    - [ ] Run `install.py` to verify schema exports correctly
-    - [ ] Commit: `docs(plugin): Add nest_panels to instructions and skill`
+- [x] [5e517b0] Task: Update documentation and installer
+    - [x] Update `instructions.md` with `nest_panels` tool documentation
+    - [x] Update `skills/openscad-mcp/SKILL.md` to include new tool description
+    - [x] Run `install.py` to verify schema exports correctly
+    - [x] Commit: `docs(plugin): Add nest_panels to instructions and skill`
 
-- [ ] Task: Final coverage verification
+- [~] Task: Final coverage verification
     - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
     - [ ] Fix any coverage gaps with targeted tests
     - [ ] Run full test suite one final time
