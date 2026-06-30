@@ -92,7 +92,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement part splitting engine with joint application`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
 
 ## Phase 4: Exploded Preview & MCP Tool Integration
 
