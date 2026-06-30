@@ -198,7 +198,8 @@ def test_mcp_registration():
         "add_dimensions",
         "generate_multiview",
         "check_interference",
-        "extract_bom"
+        "extract_bom",
+        "split_for_printing"
     ]
     for t in expected_tools:
         assert t in tool_names
@@ -387,6 +388,59 @@ def test_nest_panels_tool_simple(sample_scad_file, local_tmp_path):
         )
         assert len(res) >= 2
         assert "Successfully nested" in res[0]["text"]
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_split_for_printing_tool_auto(local_tmp_path):
+    from server import split_for_printing
+    scad_content = "module large_part() { cube([300, 150, 400]); }\nlarge_part();"
+    scad_path = os.path.join(local_tmp_path, "large_part.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    try:
+        res = split_for_printing(
+            scad_path=scad_path,
+            part_name="large_part",
+            bed_width=220.0,
+            bed_depth=220.0,
+            bed_height=250.0,
+            safety_margin=10.0,
+            split_axis="auto",
+            joint_type="auto",
+            output_dir=local_tmp_path
+        )
+        assert len(res) >= 2
+        assert "Successfully split" in res[0]["text"]
+        import json
+        data = json.loads(res[1]["text"])
+        assert "segments" in data
+        assert len(data["segments"]) == 2
+        assert data["segments"][0]["joint_type"] == "flange"
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_split_for_printing_tool_manual(local_tmp_path):
+    from server import split_for_printing
+    scad_content = "module large_part() { cube([300, 150, 400]); }\nlarge_part();"
+    scad_path = os.path.join(local_tmp_path, "large_part.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    try:
+        res = split_for_printing(
+            scad_path=scad_path,
+            part_name="large_part",
+            split_axis="z",
+            manual_coordinate=200.0,
+            joint_type="dovetail",
+            output_dir=local_tmp_path
+        )
+        assert len(res) >= 2
+        import json
+        data = json.loads(res[1]["text"])
+        assert len(data["segments"]) == 2
+        assert data["segments"][0]["joint_type"] == "dovetail"
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not found/available")
 
