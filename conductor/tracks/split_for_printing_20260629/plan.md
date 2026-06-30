@@ -71,15 +71,15 @@
 
 ## Phase 3: Part Splitting Engine & STL Export
 
-- [ ] Task: Write tests for part splitting engine
-    - [ ] Write test: splits a box into 2 halves at Z midpoint and exports 2 STL files
-    - [ ] Write test: each exported STL is manifold (non-zero volume)
-    - [ ] Write test: each segment fits within the specified bed dimensions
-    - [ ] Write test: joint features are correctly applied to split faces
-    - [ ] Write test: auto joint selection picks flange for Z-splits and dovetail for X/Y-splits
-    - [ ] Write test: explicit `joint_type` parameter overrides auto selection
-    - [ ] Write test: file naming follows `<name>_part_N.stl` convention
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [1a7560b] Task: Write tests for part splitting engine
+    - [x] Write test: splits a box into 2 halves at Z midpoint and exports 2 STL files
+    - [x] Write test: each exported STL is manifold (non-zero volume)
+    - [x] Write test: each segment fits within the specified bed dimensions
+    - [x] Write test: joint features are correctly applied to split faces
+    - [x] Write test: auto joint selection picks flange for Z-splits and dovetail for X/Y-splits
+    - [x] Write test: explicit `joint_type` parameter overrides auto selection
+    - [x] Write test: file naming follows `<name>_part_N.stl` convention
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement part splitting engine
     - [ ] Add `split_part(scad_path, part_name, split_planes, joint_configs) -> list[dict]` to `splitting.py`
