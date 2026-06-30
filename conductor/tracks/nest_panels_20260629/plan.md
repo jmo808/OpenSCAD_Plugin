@@ -67,16 +67,16 @@
     - [x] Write test: generates separate PNGs for multi-sheet layouts
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement layout PNG rendering
-    - [ ] Add `render_layout_png(sheet: dict, output_path: str, img_size: int) -> bytes` to `nesting.py`
-    - [ ] Use Pillow (PIL) to draw sheet outline, panel rectangles, kerf gaps, and text labels
-    - [ ] Scale drawing to fit `img_size` while preserving aspect ratio
-    - [ ] Draw dimension labels for the sheet edges
-    - [ ] Return base64-encoded image data for inline MCP response
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(nesting): Implement visual layout PNG rendering with Pillow`
+- [x] [bb135c0] Task: Implement layout PNG rendering
+    - [x] Add `render_layout_png(sheet: dict, output_path: str, img_size: int) -> bytes` to `nesting.py`
+    - [x] Use Pillow (PIL) to draw sheet outline, panel rectangles, kerf gaps, and text labels
+    - [x] Scale drawing to fit `img_size` while preserving aspect ratio
+    - [x] Draw dimension labels for the sheet edges
+    - [x] Return base64-encoded image data for inline MCP response (raw bytes)
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(nesting): Implement layout PNG rendering`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Visual Layout Rendering' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Visual Layout Rendering' (Protocol in workflow.md)
 
 ## Phase 4: MCP Tool Integration & Documentation
 
