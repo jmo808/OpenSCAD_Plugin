@@ -332,4 +332,136 @@ def test_flange_clearance_holes(local_tmp_path):
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not available")
 
+def test_tongue_groove_scad_generation():
+    from splitting import generate_tongue_groove_scad
+    params = {
+        "tongue_width": 5.0,
+        "tongue_depth": 3.0,
+        "clearance": 0.2
+    }
+    male_scad, female_scad = generate_tongue_groove_scad(face_width=50.0, face_height=10.0, params=params)
+    assert isinstance(male_scad, str) and len(male_scad) > 0
+    assert isinstance(female_scad, str) and len(female_scad) > 0
+
+def test_tongue_groove_clearance(local_tmp_path):
+    from splitting import generate_tongue_groove_scad
+    from stl_utils import compute_stl_volume
+    from scad_utils import run_openscad
+    
+    params_no_clearance = {
+        "tongue_width": 5.0,
+        "tongue_depth": 3.0,
+        "clearance": 0.0
+    }
+    params_clearance = {
+        "tongue_width": 5.0,
+        "tongue_depth": 3.0,
+        "clearance": 0.4
+    }
+    
+    _, female_no_clearance = generate_tongue_groove_scad(50.0, 10.0, params_no_clearance)
+    _, female_clearance = generate_tongue_groove_scad(50.0, 10.0, params_clearance)
+    
+    scad_content = f"""
+    module pocket_no_clearance() {{
+        {female_no_clearance}
+    }}
+    module pocket_clearance() {{
+        {female_clearance}
+    }}
+    part = "clearance";
+    if (part == "no_clearance") {{
+        pocket_no_clearance();
+    }} else {{
+        pocket_clearance();
+    }}
+    """
+    scad_path = os.path.join(local_tmp_path, "tongue_clearance.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    stl_no_clearance = os.path.join(local_tmp_path, "no_clearance.stl")
+    stl_clearance = os.path.join(local_tmp_path, "clearance.stl")
+    
+    try:
+        run_openscad(["-D", "part=\"no_clearance\"", "-o", stl_no_clearance, scad_path])
+        run_openscad(["-D", "part=\"clearance\"", "-o", stl_clearance, scad_path])
+        
+        vol_no_clearance = compute_stl_volume(stl_no_clearance)
+        vol_clearance = compute_stl_volume(stl_clearance)
+        
+        # Female groove with clearance should be larger
+        assert vol_clearance > vol_no_clearance
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_pin_scad_generation():
+    from splitting import generate_pin_scad
+    params = {
+        "pin_diameter": 4.0,
+        "pin_depth": 6.0,
+        "pin_count": 3,
+        "clearance": 0.2
+    }
+    male_scad, female_scad = generate_pin_scad(face_width=50.0, face_height=10.0, params=params)
+    assert isinstance(male_scad, str) and len(male_scad) > 0
+    assert isinstance(female_scad, str) and len(female_scad) > 0
+
+def test_pin_clearance(local_tmp_path):
+    from splitting import generate_pin_scad
+    from stl_utils import compute_stl_volume
+    from scad_utils import run_openscad
+    
+    params_no_clearance = {
+        "pin_diameter": 4.0,
+        "pin_depth": 6.0,
+        "pin_count": 2,
+        "clearance": 0.0
+    }
+    params_clearance = {
+        "pin_diameter": 4.0,
+        "pin_depth": 6.0,
+        "pin_count": 2,
+        "clearance": 0.4
+    }
+    
+    # In pin joint, both male and female are hole subtractions.
+    # We will test female clearance
+    _, female_no_clearance = generate_pin_scad(50.0, 10.0, params_no_clearance)
+    _, female_clearance = generate_pin_scad(50.0, 10.0, params_clearance)
+    
+    scad_content = f"""
+    module pocket_no_clearance() {{
+        {female_no_clearance}
+    }}
+    module pocket_clearance() {{
+        {female_clearance}
+    }}
+    part = "clearance";
+    if (part == "no_clearance") {{
+        pocket_no_clearance();
+    }} else {{
+        pocket_clearance();
+    }}
+    """
+    scad_path = os.path.join(local_tmp_path, "pin_clearance.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    stl_no_clearance = os.path.join(local_tmp_path, "no_clearance.stl")
+    stl_clearance = os.path.join(local_tmp_path, "clearance.stl")
+    
+    try:
+        run_openscad(["-D", "part=\"no_clearance\"", "-o", stl_no_clearance, scad_path])
+        run_openscad(["-D", "part=\"clearance\"", "-o", stl_clearance, scad_path])
+        
+        vol_no_clearance = compute_stl_volume(stl_no_clearance)
+        vol_clearance = compute_stl_volume(stl_clearance)
+        
+        # Female pin holes with clearance should be larger
+        assert vol_clearance > vol_no_clearance
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+
 
