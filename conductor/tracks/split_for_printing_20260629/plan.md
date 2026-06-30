@@ -48,12 +48,12 @@
     - [x] Write test: clearance parameter applied to hole diameters
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement flange joint generator
-    - [ ] Add `generate_flange_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
-    - [ ] Generate tab geometry with M3 counterbored holes and hex nut traps
-    - [ ] Use standard metric fastener dimensions (M3: 3.0mm shaft, 5.5mm head, 6.4mm nut width)
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement flange joint with screw/nut pockets`
+- [x] [98b25db] Task: Implement flange joint generator
+    - [x] Add `generate_flange_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
+    - [x] Generate tab geometry with M3 counterbored holes and hex nut traps
+    - [x] Use standard metric fastener dimensions (M3: 3.0mm shaft, 5.5mm head, 6.4mm nut width)
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement flange joint with screw/nut pockets`
 
 - [ ] Task: Write tests for tongue-and-groove and pin joint generators
     - [ ] Write test: tongue-and-groove produces matching ridge and slot geometry
