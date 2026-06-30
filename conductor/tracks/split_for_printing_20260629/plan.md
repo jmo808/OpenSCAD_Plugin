@@ -96,11 +96,11 @@
 
 ## Phase 4: Exploded Preview & MCP Tool Integration
 
-- [ ] Task: Write tests for exploded preview render
-    - [ ] Write test: generates a PNG showing segments offset along split axis
-    - [ ] Write test: joint features are visible in the exploded view
-    - [ ] Write test: returns inline base64 image data
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [12b8f97, c7138b4] Task: Write tests for exploded preview and MCP tool
+    - [x] Write test: generates exploded preview SCAD with parts translated outwards from center
+    - [x] Write test: MCP tool schema matches the expected parameters
+    - [x] Write test: MCP tool correctly calls `split_part` and handles output serialization
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement exploded preview render
     - [ ] Add `generate_exploded_preview(scad_path, segments, split_axis, output_path) -> bytes`
