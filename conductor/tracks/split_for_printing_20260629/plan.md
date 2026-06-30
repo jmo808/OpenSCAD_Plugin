@@ -69,7 +69,7 @@
 
 - [x] [af5b37c] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
 
-## Phase 3: Part Splitting Engine & STL Export
+## Phase 3: Part Splitting Engine & STL Export [checkpoint: 8cf0a4c]
 
 - [x] [1a7560b] Task: Write tests for part splitting engine
     - [x] Write test: splits a box into 2 halves at Z midpoint and exports 2 STL files
@@ -92,7 +92,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement part splitting engine with joint application`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
+- [x] [8cf0a4c] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
 
 ## Phase 4: Exploded Preview & MCP Tool Integration
 
