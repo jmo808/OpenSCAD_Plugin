@@ -116,12 +116,12 @@
     - [x] Write test: returns inline exploded preview PNG
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement `split_for_printing` MCP tool
+- [~] Task: Implement `split_for_printing` MCP tool
     - [ ] Add `@mcp.tool()` decorated `split_for_printing` function to `server.py`
-    - [ ] Wire up split plane calculation, joint generation, splitting engine, and preview
-    - [ ] Build structured JSON response matching the schema
-    - [ ] Build conversational human-readable summary
-    - [ ] Include absolute file paths for all exported STLs and preview
+    - [ ] Implement parameter mapping: `scad_path`, `part_name`, `bed_width`, `bed_depth`, `bed_height`, `safety_margin`, `split_axis`, `joint_type`, `manual_coordinate`, `joint_configs`, `output_dir`
+    - [ ] Compute split planes using `calculate_split_planes` (for auto) or `validate_manual_split` (for manual)
+    - [ ] Call `split_part` to perform segment splitting and export
+    - [ ] Call `generate_exploded_scad` and save it to `<name>_exploded.scad`
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(server): Implement split_for_printing MCP tool`
 
