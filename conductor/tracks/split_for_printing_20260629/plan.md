@@ -81,16 +81,16 @@
     - [x] Write test: file naming follows `<name>_part_N.stl` convention
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement part splitting engine
-    - [ ] Add `split_part(scad_path, part_name, split_planes, joint_configs) -> list[dict]` to `splitting.py`
-    - [ ] For each split plane, generate temporary SCAD code that:
+- [x] [30173f2] Task: Implement part splitting engine
+    - [x] Add `split_part(scad_path, part_name, split_planes, joint_configs) -> list[dict]` to `splitting.py`
+    - [x] For each split plane, generate temporary SCAD code that:
       1. Intersects the original part with a half-space (cube positioned above/below the split plane)
       2. Unions the appropriate joint geometry onto the split face
-    - [ ] Invoke OpenSCAD CLI to export each segment as STL
-    - [ ] Verify each STL has non-zero volume
-    - [ ] Implement `auto_select_joint(axis) -> str` for automatic joint selection
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement part splitting engine with joint application`
+    - [x] Invoke OpenSCAD CLI to export each segment as STL
+    - [x] Verify each STL has non-zero volume
+    - [x] Implement `auto_select_joint(axis) -> str` for automatic joint selection
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement part splitting engine with joint application`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Part Splitting Engine & STL Export' (Protocol in workflow.md)
 
