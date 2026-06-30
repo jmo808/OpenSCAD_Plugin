@@ -104,10 +104,10 @@
     - [x] Run `install.py` to verify schema exports correctly
     - [x] Commit: `docs(plugin): Add nest_panels to instructions and skill`
 
-- [~] Task: Final coverage verification
-    - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
-    - [ ] Fix any coverage gaps with targeted tests
-    - [ ] Run full test suite one final time
-    - [ ] Commit: `test(coverage): Ensure >80% coverage for nesting module`
+- [x] [c0c187e] Task: Final coverage verification
+    - [x] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
+    - [x] Fix any coverage gaps with targeted tests
+    - [x] Run full test suite one final time
+    - [x] Commit: `test(coverage): Ensure >80% coverage for nesting module`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
