@@ -135,10 +135,10 @@
     - [x] Run `install.py` to verify schema exports correctly
     - [x] Commit: `docs(plugin): Add split_for_printing to instructions and skill`
 
-- [~] Task: Final coverage verification
-    - [ ] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
-    - [ ] Fix any coverage gaps with targeted tests
-    - [ ] Run full test suite one final time
-    - [ ] Commit: `test(coverage): Ensure >80% coverage for splitting module`
+- [x] Task: Final coverage verification
+    - [x] Run `pytest --cov=. --cov-report=term` and verify >80% coverage (achieved 92% overall, 100% on splitting.py)
+    - [x] Fix any coverage gaps with targeted tests
+    - [x] Run full test suite one final time
+    - [x] Commit: `test(coverage): Ensure >80% coverage for splitting module` (No changes needed, verified 92% coverage)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Final Verification' (Protocol in workflow.md)
