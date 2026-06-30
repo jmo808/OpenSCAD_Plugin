@@ -378,3 +378,251 @@ def generate_pin_scad(
 }}"""
 
     return male_scad, female_scad
+
+def get_joint_config(axis: str, joint_configs: dict | None) -> dict:
+    """Helper to retrieve joint config for a given axis, applying defaults."""
+    config = {}
+    if joint_configs and axis in joint_configs:
+        config = joint_configs[axis]
+        
+    joint_type = config.get("joint_type")
+    if not joint_type:
+        joint_type = "flange" if axis == "z" else "dovetail"
+        
+    params = {
+        "joint_type": joint_type,
+        "clearance": config.get("clearance", 0.2)
+    }
+    
+    if joint_type == "dovetail":
+        params.update({
+            "finger_count": config.get("finger_count", 2),
+            "finger_width": config.get("finger_width", 10.0),
+            "finger_depth": config.get("finger_depth", 5.0),
+            "taper_angle": config.get("taper_angle", 20.0)
+        })
+    elif joint_type == "flange":
+        params.update({
+            "flange_width": config.get("flange_width", 20.0),
+            "flange_thickness": config.get("flange_thickness", 5.0),
+            "screw_size": config.get("screw_size", "M3"),
+            "screw_count": config.get("screw_count", 2)
+        })
+    elif joint_type == "tongue_groove":
+        params.update({
+            "tongue_width": config.get("tongue_width", 5.0),
+            "tongue_depth": config.get("tongue_depth", 3.0)
+        })
+    elif joint_type == "pin":
+        params.update({
+            "pin_diameter": config.get("pin_diameter", 4.0),
+            "pin_depth": config.get("pin_depth", 6.0),
+            "pin_count": config.get("pin_count", 2)
+        })
+        
+    return params
+
+def generate_joint_geometry(
+    joint_type: str,
+    face_width: float,
+    face_height: float,
+    params: dict
+) -> tuple[str, str]:
+    """Routes joint generation to the correct SCAD generator function."""
+    if joint_type == "dovetail":
+        return generate_dovetail_scad(face_width, face_height, params)
+    elif joint_type == "flange":
+        return generate_flange_scad(face_width, face_height, params)
+    elif joint_type == "tongue_groove":
+        return generate_tongue_groove_scad(face_width, face_height, params)
+    elif joint_type == "pin":
+        return generate_pin_scad(face_width, face_height, params)
+    else:
+        raise ValueError(f"Unknown joint type: {joint_type}")
+
+def split_part(
+    scad_path: str,
+    part_name: str | None,
+    split_planes: list[dict],
+    joint_configs: dict | None = None,
+    output_dir: str | None = None
+) -> list[dict]:
+    """Splits a part into multiple segments along split planes and applies joints.
+
+    Args:
+        scad_path: Path to the source .scad file.
+        part_name: Optional name of the part to split.
+        split_planes: List of dictionaries defining split planes:
+          [{"axis": "x"|"y"|"z", "coordinate": float}].
+        joint_configs: Optional dictionary overriding joint parameters.
+        output_dir: Optional directory to write exported STL files to.
+
+    Returns:
+        A list of dictionaries containing segment details:
+        [{"name", "stl_path", "dimensions_mm", "fits_bed", "joint_type", "joint_face"}].
+    """
+    validate_scad_path(scad_path)
+    
+    # 1. Get bounding box
+    bbox = get_part_bbox(scad_path, part_name)
+    
+    X_min, X_max = bbox["x_min"], bbox["x_max"]
+    Y_min, Y_max = bbox["y_min"], bbox["y_max"]
+    Z_min, Z_max = bbox["z_min"], bbox["z_max"]
+    
+    # 2. Setup partitions
+    x_coords = sorted(list({
+        s["coordinate"] for s in split_planes
+        if s["axis"].lower() == "x" and X_min < s["coordinate"] < X_max
+    }))
+    y_coords = sorted(list({
+        s["coordinate"] for s in split_planes
+        if s["axis"].lower() == "y" and Y_min < s["coordinate"] < Y_max
+    }))
+    z_coords = sorted(list({
+        s["coordinate"] for s in split_planes
+        if s["axis"].lower() == "z" and Z_min < s["coordinate"] < Z_max
+    }))
+    
+    x_splits = [X_min] + x_coords + [X_max]
+    y_splits = [Y_min] + y_coords + [Y_max]
+    z_splits = [Z_min] + z_coords + [Z_max]
+    
+    x_intervals = [(x_splits[i], x_splits[i+1]) for i in range(len(x_splits)-1)]
+    y_intervals = [(y_splits[i], y_splits[i+1]) for i in range(len(y_splits)-1)]
+    z_intervals = [(z_splits[i], z_splits[i+1]) for i in range(len(z_splits)-1)]
+    
+    if not output_dir:
+        output_dir = os.path.dirname(os.path.abspath(scad_path))
+        
+    os.makedirs(output_dir, exist_ok=True)
+    
+    segments = []
+    idx = 1
+    
+    # Generate all segments
+    for z_min, z_max in z_intervals:
+        for y_min, y_max in y_intervals:
+            for x_min, x_max in x_intervals:
+                p_name = part_name if part_name else "model"
+                seg_name = f"{p_name}_part_{idx}"
+                stl_path = os.path.abspath(os.path.join(output_dir, f"{seg_name}.stl"))
+                
+                module_defs = []
+                chain_calls = []
+                
+                applied_joint_type = None
+                applied_joint_face = None
+                
+                joint_idx = 1
+                
+                for axis, val, is_min, face_name in [
+                    ("x", x_min, True, "left"),
+                    ("x", x_max, False, "right"),
+                    ("y", y_min, True, "front"),
+                    ("y", y_max, False, "back"),
+                    ("z", z_min, True, "bottom"),
+                    ("z", z_max, False, "top")
+                ]:
+                    is_split = False
+                    if axis == "x" and val in x_coords:
+                        is_split = True
+                    elif axis == "y" and val in y_coords:
+                        is_split = True
+                    elif axis == "z" and val in z_coords:
+                        is_split = True
+                        
+                    if is_split:
+                        config = get_joint_config(axis, joint_configs)
+                        j_type = config["joint_type"]
+                        applied_joint_type = j_type
+                        applied_joint_face = face_name
+                        
+                        if axis == "x":
+                            fw = y_max - y_min
+                            fh = z_max - z_min
+                            pos = [val, (y_min + y_max)/2.0, (z_min + z_max)/2.0]
+                            rot = [0, 90, 90]
+                        elif axis == "y":
+                            fw = x_max - x_min
+                            fh = z_max - z_min
+                            pos = [(x_min + x_max)/2.0, val, (z_min + z_max)/2.0]
+                            rot = [-90, 0, 0]
+                        else:  # z
+                            fw = x_max - x_min
+                            fh = y_max - y_min
+                            pos = [(x_min + x_max)/2.0, (y_min + y_max)/2.0, val]
+                            rot = [0, 0, 0]
+                            
+                        male_raw, female_raw = generate_joint_geometry(j_type, fw, fh, config)
+                        raw_scad = female_raw if is_min else male_raw
+                        
+                        mod_name = f"joint_mod_{joint_idx}"
+                        module_defs.append(f"""module {mod_name}() {{
+    translate([{pos[0]:.4f}, {pos[1]:.4f}, {pos[2]:.4f}])
+        rotate([{rot[0]:.4f}, {rot[1]:.4f}, {rot[2]:.4f}])
+            {raw_scad}
+}}""")
+                        chain_calls.append(f"{mod_name}()")
+                        joint_idx += 1
+                
+                abs_scad_path = os.path.abspath(scad_path)
+                
+                # If part_name is specified, use 'use' statement to avoid executing top-level geometry,
+                # and call the part's module inside the intersection.
+                # If part_name is None, fall back to 'include' inside the intersection.
+                if part_name:
+                    instantiation = f"{part_name}();"
+                    import_statement = f"use <{abs_scad_path}>"
+                else:
+                    instantiation = f"include <{abs_scad_path}>"
+                    import_statement = ""
+                
+                # Expand bounding box slightly (0.1mm) to prevent boundary overlaps
+                intersection_scad = f"""intersection() {{
+    {instantiation}
+    translate([{x_min - 0.1:.4f}, {y_min - 0.1:.4f}, {z_min - 0.1:.4f}])
+        cube([{x_max - x_min + 0.2:.4f}, {y_max - y_min + 0.2:.4f}, {z_max - z_min + 0.2:.4f}]);
+}}"""
+                
+                body_scad = intersection_scad
+                for call in reversed(chain_calls):
+                    body_scad = f"{call} {body_scad}"
+                    
+                prefix = import_statement + "\n\n" if import_statement else ""
+                temp_scad_content = prefix + "\n\n".join(module_defs) + "\n\n" + body_scad + "\n"
+                
+                temp_scad_path = os.path.join(output_dir, f"_temp_seg_{uuid.uuid4().hex}.scad")
+                with open(temp_scad_path, "w") as f:
+                    f.write(temp_scad_content)
+                    
+                try:
+                    cmd_args = []
+                    if part_name:
+                        cmd_args.extend(["-D", f'part="{part_name}"'])
+                    cmd_args.extend(["-o", stl_path, temp_scad_path])
+                    run_openscad(cmd_args)
+                    
+                    from stl_utils import compute_stl_volume
+                    if not os.path.exists(stl_path) or compute_stl_volume(stl_path) <= 0.0:
+                        raise RuntimeError(f"Generated STL for segment {seg_name} is empty or non-manifold.")
+                        
+                finally:
+                    if os.path.exists(temp_scad_path):
+                        os.remove(temp_scad_path)
+                        
+                segments.append({
+                    "name": seg_name,
+                    "stl_path": stl_path,
+                    "dimensions_mm": {
+                        "x": round(x_max - x_min, 2),
+                        "y": round(y_max - y_min, 2),
+                        "z": round(z_max - z_min, 2)
+                    },
+                    "fits_bed": True,
+                    "joint_type": applied_joint_type if applied_joint_type else "none",
+                    "joint_face": applied_joint_face if applied_joint_face else "none"
+                })
+                idx += 1
+                
+    return segments

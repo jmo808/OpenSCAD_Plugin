@@ -537,6 +537,99 @@ def test_split_part_override_joint(local_tmp_path, oversized_scad_file):
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not available")
 
+def test_generate_joint_geometry_invalid():
+    import pytest
+    from splitting import generate_joint_geometry
+    with pytest.raises(ValueError, match="Unknown joint type"):
+        generate_joint_geometry("invalid_type", 10.0, 10.0, {})
+
+def test_split_part_other_joints_and_axes(local_tmp_path, oversized_scad_file):
+    from splitting import split_part
+    
+    # Test X split with tongue_groove
+    split_planes_x = [{"axis": "x", "coordinate": 150.0}]
+    joint_configs_x = {
+        "x": {"joint_type": "tongue_groove", "tongue_width": 4.0, "tongue_depth": 2.0}
+    }
+    
+    # Test Y split with pin
+    split_planes_y = [{"axis": "y", "coordinate": 75.0}]
+    joint_configs_y = {
+        "y": {"joint_type": "pin", "pin_diameter": 3.0, "pin_depth": 4.0, "pin_count": 1}
+    }
+    
+    try:
+        segments_x = split_part(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes_x,
+            joint_configs=joint_configs_x,
+            output_dir=local_tmp_path
+        )
+        assert len(segments_x) == 2
+        tg_segments = [s for s in segments_x if s["joint_type"] == "tongue_groove"]
+        assert len(tg_segments) > 0
+        
+        segments_y = split_part(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes_y,
+            joint_configs=joint_configs_y,
+            output_dir=local_tmp_path
+        )
+        assert len(segments_y) == 2
+        pin_segments = [s for s in segments_y if s["joint_type"] == "pin"]
+        assert len(pin_segments) > 0
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_split_part_no_part_name(local_tmp_path):
+    import os
+    from splitting import split_part
+    
+    # Create a scad file without part_name/modules, just raw geometry
+    scad_content = "cube([100, 100, 100]);"
+    scad_path = os.path.join(local_tmp_path, "raw_model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    split_planes = [{"axis": "z", "coordinate": 50.0}]
+    
+    try:
+        segments = split_part(
+            scad_path=scad_path,
+            part_name=None,
+            split_planes=split_planes,
+            joint_configs=None,
+            output_dir=None  # will use default output_dir
+        )
+        assert len(segments) == 2
+        assert segments[0]["name"] == "model_part_1"
+        assert segments[1]["name"] == "model_part_2"
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_split_part_invalid_stl(local_tmp_path, oversized_scad_file):
+    import pytest
+    from unittest.mock import patch
+    from splitting import split_part
+    
+    split_planes = [{"axis": "z", "coordinate": 200.0}]
+    # Mock compute_stl_volume to return 0 or non-manifold
+    with patch("stl_utils.compute_stl_volume", return_value=0.0):
+        try:
+            with pytest.raises(RuntimeError, match="empty or non-manifold"):
+                split_part(
+                    scad_path=oversized_scad_file,
+                    part_name="oversized_box",
+                    split_planes=split_planes,
+                    joint_configs=None,
+                    output_dir=local_tmp_path
+                )
+        except FileNotFoundError:
+            pytest.skip("OpenSCAD binary not available")
+
+
 
 
 
