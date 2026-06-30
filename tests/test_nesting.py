@@ -232,5 +232,6 @@ def test_render_layout_png_basic(local_tmp_path):
     with PILImage.open(out_png) as img:
         assert img.format == "PNG"
         # Since sheet is 600x1200, aspect ratio is 1:2.
-        # Max dimension is img_size=800 (height), so width should be 400.
-        assert img.size == (400, 800)
+        # Max available dimension is img_size - 2*padding = 700 (height), so available width is 350.
+        # Adding back 2*padding (100) gives final size of 450 x 800.
+        assert img.size == (450, 800)

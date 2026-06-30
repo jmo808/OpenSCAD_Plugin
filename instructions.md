@@ -89,6 +89,19 @@ Parses tagged hardware annotations embedded in OpenSCAD source files and compile
   - `output_dir` (string, optional): Directory where the output files (`bom.json`, `bom.md`, `bom.csv`) will be saved. Defaults to `~/.openscad_bom/`.
   - `formats` (array of strings, optional): Which formats to export. Defaults to `["json", "md", "csv"]`.
 
+### 9. `nest_panels`
+Nests 2D panel templates from an OpenSCAD assembly model onto stock sheets, optimizing material utilization.
+- **When to use:** Use this tool to plan sheet layout, determine how many sheets are needed for fabrication, and generate a cutting layout with visual preview and utilization percentage.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `sheet_preset` (string, default "2x4"): Preset sheet size: "4x8" (1219.2 x 2438.4 mm) or "2x4" (609.6 x 1219.2 mm).
+  - `sheet_width` (number, optional): Custom sheet width override in mm.
+  - `sheet_height` (number, optional): Custom sheet height override in mm.
+  - `kerf` (number, default 3.175): Cut width/spacing between panels in mm.
+  - `parts` (array of strings, optional): Specific parts to nest. If omitted, nests all discovered parts.
+  - `strategy` (string, default "optimized"): Packing algorithm: "simple" (shelf packing) or "optimized" (First-Fit Decreasing with 90° rotation).
+  - `output_dir` (string, optional): Directory where the PNG layout previews will be saved. Defaults to `<scad_dir>/nesting_previews/`.
+
 ## Environment Variables
 - `OPENSCAD_BINARY_PATH`: Path to the OpenSCAD command-line executable. Defaults to `/home/jules/.local/bin/openscad`.
 - `OPENSCAD_DEFAULT_TOLERANCE`: Default design tolerance (for clearances/fits). Defaults to `0.05`.
