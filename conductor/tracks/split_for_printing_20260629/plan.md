@@ -61,11 +61,11 @@
     - [x] Write test: clearance applied correctly to both joint types
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement tongue-and-groove and pin joint generators
-    - [ ] Add `generate_tongue_groove_scad(face_width, face_height, params) -> tuple[str, str]`
-    - [ ] Add `generate_pin_scad(face_width, face_height, params) -> tuple[str, str]`
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement tongue-groove and pin joint generators`
+- [x] [8dd1f5b] Task: Implement tongue-and-groove and pin joint generators
+    - [x] Add `generate_tongue_groove_scad(face_width, face_height, params) -> tuple[str, str]`
+    - [x] Add `generate_pin_scad(face_width, face_height, params) -> tuple[str, str]`
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement tongue-groove and pin joint generators`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
 
