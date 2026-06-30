@@ -41,12 +41,12 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement dovetail joint generator`
 
-- [ ] Task: Write tests for flange joint generator
-    - [ ] Write test: generates overlapping tab geometry with correct dimensions
-    - [ ] Write test: counterbored clearance holes on one half, hex nut pockets on the other
-    - [ ] Write test: screw count and size (M2, M3, M4) are configurable
-    - [ ] Write test: clearance parameter applied to hole diameters
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [b0eea10] Task: Write tests for flange joint generator
+    - [x] Write test: generates overlapping tab geometry with correct dimensions
+    - [x] Write test: counterbored clearance holes on one half, hex nut pockets on the other
+    - [x] Write test: screw count and size (M2, M3, M4) are configurable
+    - [x] Write test: clearance parameter applied to hole diameters
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement flange joint generator
     - [ ] Add `generate_flange_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
