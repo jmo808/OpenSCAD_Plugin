@@ -125,11 +125,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(server): Implement split_for_printing MCP tool`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Exploded Preview & MCP Tool Integration' (Protocol in workflow.md)
+- [x] [27c6b53] Task: Conductor - User Manual Verification 'Phase 4: Exploded Preview & MCP Tool Integration' (Protocol in workflow.md)
 
 ## Phase 5: Documentation & Final Verification
 
-- [ ] Task: Update documentation and installer
+- [~] Task: Update documentation and installer
     - [ ] Update `instructions.md` with `split_for_printing` tool documentation
     - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
     - [ ] Run `install.py` to verify schema exports correctly
