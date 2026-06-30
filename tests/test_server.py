@@ -352,6 +352,45 @@ def test_extract_bom_tool_malformed(local_tmp_path):
     assert "Found 1 hardware items" in res[0]["text"] or "found 1 hardware items" in res[0]["text"].lower()
     assert "warning" in res[0]["text"].lower()
 
+def test_nest_panels_tool_optimized(sample_scad_file, local_tmp_path):
+    from server import nest_panels
+    output_dir = os.path.join(local_tmp_path, "nest_out")
+    
+    try:
+        res = nest_panels(
+            scad_path=sample_scad_file,
+            sheet_preset="2x4",
+            kerf=2.0,
+            strategy="optimized",
+            output_dir=output_dir
+        )
+        assert len(res) >= 2
+        assert "Successfully nested" in res[0]["text"]
+        files = os.listdir(output_dir)
+        pngs = [f for f in files if f.endswith(".png")]
+        assert len(pngs) >= 1
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+def test_nest_panels_tool_simple(sample_scad_file, local_tmp_path):
+    from server import nest_panels
+    output_dir = os.path.join(local_tmp_path, "nest_out_simple")
+    
+    try:
+        res = nest_panels(
+            scad_path=sample_scad_file,
+            sheet_width=300.0,
+            sheet_height=300.0,
+            kerf=1.0,
+            strategy="simple",
+            output_dir=output_dir
+        )
+        assert len(res) >= 2
+        assert "Successfully nested" in res[0]["text"]
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not found/available")
+
+
 
 
 
