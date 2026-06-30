@@ -701,5 +701,117 @@ def extract_bom(
         {"type": "text", "text": json_text}
     ]
 
+@mcp.tool()
+def nest_panels(
+    scad_path: str,
+    sheet_preset: str = "2x4",
+    sheet_width: float = None,
+    sheet_height: float = None,
+    kerf: float = 3.175,
+    parts: list[str] = None,
+    strategy: str = "optimized",
+    output_dir: str = None
+) -> list:
+    """Nests 2D panel templates from an OpenSCAD assembly model onto stock sheets.
+
+    Optimizes material utilization using either horizontal shelf-packing (simple)
+    or a First-Fit Decreasing algorithm with 90° rotation (optimized).
+
+    Args:
+        scad_path: Path to the source .scad file.
+        sheet_preset: Preset sheet size: "4x8" (1219.2 x 2438.4 mm) or "2x4" (609.6 x 1219.2 mm) [default].
+        sheet_width: Custom sheet width override (in mm).
+        sheet_height: Custom sheet height override (in mm).
+        kerf: Spacing to reserve between nested panels and from sheet edges (in mm) [default 3.175].
+        parts: Optional list of part names to nest. If not specified, nests all discovered parts.
+        strategy: Packing strategy: "simple" (shelf packing) or "optimized" (First-Fit Decreasing) [default].
+        output_dir: Directory to save layout PNGs. If not specified, saves to <scad_dir>/nesting_previews/.
+
+    Returns:
+        A list containing a text explanation with structured JSON results, followed by
+        the inline base64 image content of each sheet layout PNG.
+    """
+    # 1. Resolve sheet dimensions
+    preset_w, preset_h = 609.6, 1219.2  # "2x4" default
+    if sheet_preset == "4x8":
+        preset_w, preset_h = 1219.2, 2438.4
+    elif sheet_preset == "2x4":
+        preset_w, preset_h = 609.6, 1219.2
+        
+    width = sheet_width if sheet_width is not None else preset_w
+    height = sheet_height if sheet_height is not None else preset_h
+
+    # 2. Extract panel dimensions
+    from nesting import extract_panel_dimensions, pack_shelf, pack_ffd, render_layout_png
+    
+    try:
+        panels = extract_panel_dimensions(scad_path, parts=parts)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(str(e))
+    except Exception as e:
+        raise RuntimeError(f"Failed to extract panel dimensions: {str(e)}")
+        
+    if not panels:
+        summary_text = "No parts with selector pattern found in SCAD model. Nothing to nest."
+        return [{"type": "text", "text": summary_text}, {"type": "text", "text": "{}"}]
+
+    # 3. Perform packing
+    if strategy == "simple":
+        sheets = pack_shelf(panels, width, height, kerf)
+    elif strategy == "optimized":
+        sheets = pack_ffd(panels, width, height, kerf)
+    else:
+        raise ValueError(f"Unknown strategy: {strategy}. Use 'simple' or 'optimized'.")
+
+    # 4. Save PNG layouts
+    if output_dir is None:
+        scad_dir = os.path.dirname(os.path.abspath(scad_path))
+        output_dir = os.path.join(scad_dir, "nesting_previews")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    rendered_sheets = []
+    for sheet in sheets:
+        sheet_num = sheet["sheet_number"]
+        out_png = os.path.join(output_dir, f"sheet_{sheet_num}_layout.png")
+        
+        # Render PNG and get raw bytes
+        img_bytes = render_layout_png(sheet, out_png, img_size=800)
+        
+        sheet["layout_image_path"] = os.path.abspath(out_png)
+        img_content = Image(data=img_bytes, format="png").to_image_content()
+        rendered_sheets.append((sheet, img_content))
+
+    # 5. Build summary text
+    num_sheets = len(sheets)
+    total_parts = len(panels)
+    avg_util = sum(s["utilization_percent"] for s in sheets) / num_sheets if num_sheets > 0 else 0.0
+    
+    summary = (
+        f"Successfully nested {total_parts} panels onto {num_sheets} sheet(s) using '{strategy}' strategy.\n"
+        f"Sheet size: {width} x {height} mm (kerf: {kerf} mm).\n"
+        f"Average material utilization: {avg_util:.2f}%\n\n"
+        "Sheet layouts saved in directory:\n"
+        f"  {os.path.abspath(output_dir)}\n\n"
+        "Sheet Details:\n"
+    )
+    for s in sheets:
+        summary += (
+            f"  Sheet {s['sheet_number']}:\n"
+            f"    - Parts placed: {len(s['panels'])}\n"
+            f"    - Utilization: {s['utilization_percent']}%\n"
+            f"    - Waste: {s['waste_area_mm2']} mm²\n"
+            f"    - Image path: {s['layout_image_path']}\n"
+        )
+        
+    text_content = {"type": "text", "text": summary}
+    structured_json = json.dumps({"sheets": sheets}, indent=2)
+    json_content = {"type": "text", "text": structured_json}
+    
+    result_list = [text_content, json_content]
+    for _, img_content in rendered_sheets:
+        result_list.append(img_content)
+        
+    return result_list
+
 if __name__ == "__main__":
     mcp.run()
