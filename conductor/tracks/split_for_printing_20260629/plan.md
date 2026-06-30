@@ -102,11 +102,11 @@
     - [x] Write test: MCP tool correctly calls `split_part` and handles output serialization
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement exploded preview render
-    - [ ] Add `generate_exploded_scad(scad_path, part_name, split_planes, joint_configs, offset) -> str` to `splitting.py`
-    - [ ] Generate temporary SCAD that translates each segment along the split axis with offset gaps
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(splitting): Implement exploded view preview render`
+- [x] [ebeaf52] Task: Implement exploded preview render
+    - [x] Add `generate_exploded_scad(scad_path, part_name, split_planes, joint_configs, offset) -> str` to `splitting.py`
+    - [x] Generate temporary SCAD that translates each segment along the split axis with offset gaps
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(splitting): Implement exploded view preview render`
 
 - [x] [c7138b4] Task: Write tests for `split_for_printing` MCP tool
     - [x] Write test: tool is registered and appears in MCP schema
