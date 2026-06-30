@@ -90,16 +90,15 @@
     - [x] Write test: custom `sheet_width` and `sheet_height` override preset
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [~] Task: Implement `nest_panels` MCP tool
-    - [ ] Add `@mcp.tool()` decorated `nest_panels` function to `server.py`
-    - [ ] Wire up panel extraction, packing algorithm selection, and layout rendering
-    - [ ] Build structured JSON response matching the schema
-    - [ ] Build conversational human-readable summary text
-    - [ ] Include absolute file paths for all generated layout PNGs
-    - [ ] Run tests and confirm they all pass (Green phase)
-    - [ ] Commit: `feat(server): Implement nest_panels MCP tool`
+- [x] [52a1110] Task: Implement `nest_panels` MCP tool
+    - [x] Add `@mcp.tool()` decorated `nest_panels` function to `server.py`
+    - [x] Wire up panel extraction, packing algorithm selection, and layout rendering
+    - [x] Build structured JSON response matching the schema
+    - [x] Support preset overrides and custom output directory
+    - [x] Run tests and confirm they all pass (Green phase)
+    - [x] Commit: `feat(nesting): Implement nest_panels MCP tool`
 
-- [ ] Task: Update documentation and installer
+- [~] Task: Update documentation and installer
     - [ ] Update `instructions.md` with `nest_panels` tool documentation
     - [ ] Update `skills/openscad-mcp/SKILL.md` to include new tool description
     - [ ] Run `install.py` to verify schema exports correctly
