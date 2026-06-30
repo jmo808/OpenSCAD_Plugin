@@ -102,21 +102,19 @@
     - [x] Write test: MCP tool correctly calls `split_part` and handles output serialization
     - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement exploded preview render
-    - [ ] Add `generate_exploded_preview(scad_path, segments, split_axis, output_path) -> bytes`
+- [~] Task: Implement exploded preview render
+    - [ ] Add `generate_exploded_scad(scad_path, part_name, split_planes, joint_configs, offset) -> str` to `splitting.py`
     - [ ] Generate temporary SCAD that translates each segment along the split axis with offset gaps
-    - [ ] Render via OpenSCAD CLI using isometric camera preset
-    - [ ] Return base64-encoded image
     - [ ] Run tests and confirm they all pass (Green phase)
     - [ ] Commit: `feat(splitting): Implement exploded view preview render`
 
-- [ ] Task: Write tests for `split_for_printing` MCP tool
-    - [ ] Write test: tool is registered and appears in MCP schema
-    - [ ] Write test: auto mode returns structured JSON with correct segments for oversized part
-    - [ ] Write test: manual mode returns correct split at specified coordinate
-    - [ ] Write test: returns human-readable summary with file paths
-    - [ ] Write test: returns inline exploded preview PNG
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [c7138b4] Task: Write tests for `split_for_printing` MCP tool
+    - [x] Write test: tool is registered and appears in MCP schema
+    - [x] Write test: auto mode returns structured JSON with correct segments for oversized part
+    - [x] Write test: manual mode returns correct split at specified coordinate
+    - [x] Write test: returns human-readable summary with file paths
+    - [x] Write test: returns inline exploded preview PNG
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement `split_for_printing` MCP tool
     - [ ] Add `@mcp.tool()` decorated `split_for_printing` function to `server.py`
