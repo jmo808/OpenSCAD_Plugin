@@ -58,7 +58,7 @@
 
 - [x] [4a0c32a] Task: Conductor - User Manual Verification 'Phase 2: Packing Algorithms' (Protocol in workflow.md)
 
-## Phase 3: Visual Layout Rendering
+## Phase 3: Visual Layout Rendering [checkpoint: 8048d33]
 
 - [x] [7f88b88] Task: Write tests for layout PNG generation
     - [x] Write test: generates a PNG file for a valid nesting layout
@@ -76,11 +76,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement layout PNG rendering`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Visual Layout Rendering' (Protocol in workflow.md)
+- [x] [8048d33] Task: Conductor - User Manual Verification 'Phase 3: Visual Layout Rendering' (Protocol in workflow.md)
 
 ## Phase 4: MCP Tool Integration & Documentation
 
-- [ ] Task: Write tests for `nest_panels` MCP tool
+- [~] Task: Write tests for `nest_panels` MCP tool
     - [ ] Write test: tool is registered and appears in MCP schema
     - [ ] Write test: returns structured JSON matching the schema for a valid SCAD file
     - [ ] Write test: returns human-readable summary with file paths and utilization
