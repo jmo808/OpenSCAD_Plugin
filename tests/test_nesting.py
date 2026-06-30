@@ -206,3 +206,31 @@ def test_pack_ffd_better_utilization():
     sheets_ffd = pack_ffd(panels, sheet_w=200.0, sheet_h=200.0, kerf=0.0)
     assert len(sheets_ffd) == 1
     assert len(sheets_ffd[0]["panels"]) == 3
+
+from nesting import render_layout_png
+from PIL import Image as PILImage
+
+def test_render_layout_png_basic(local_tmp_path):
+    sheet = {
+        "sheet_number": 1,
+        "sheet_width_mm": 600.0,
+        "sheet_height_mm": 1200.0,
+        "panels": [
+            {"part_name": "p1", "x": 10.0, "y": 10.0, "width": 100.0, "height": 200.0, "rotated": False},
+            {"part_name": "p2", "x": 120.0, "y": 10.0, "width": 150.0, "height": 200.0, "rotated": True}
+        ],
+        "utilization_percent": 35.0,
+        "waste_area_mm2": 468000.0
+    }
+    
+    out_png = os.path.join(local_tmp_path, "layout.png")
+    img_bytes = render_layout_png(sheet, out_png, img_size=800)
+    
+    assert os.path.exists(out_png)
+    assert len(img_bytes) > 0
+    
+    with PILImage.open(out_png) as img:
+        assert img.format == "PNG"
+        # Since sheet is 600x1200, aspect ratio is 1:2.
+        # Max dimension is img_size=800 (height), so width should be 400.
+        assert img.size == (400, 800)
