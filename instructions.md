@@ -101,7 +101,23 @@ Nests 2D panel templates from an OpenSCAD assembly model onto stock sheets, opti
   - `parts` (array of strings, optional): Specific parts to nest. If omitted, nests all discovered parts.
   - `strategy` (string, default "optimized"): Packing algorithm: "simple" (shelf packing) or "optimized" (First-Fit Decreasing with 90° rotation).
   - `output_dir` (string, optional): Directory where the PNG layout previews will be saved. Defaults to `<scad_dir>/nesting_previews/`.
+### 10. `split_for_printing`
+Splits a large 3D part into segments fitting the specified printer bed, applying interlocking joining mechanisms (dovetail, flange, tongue-and-groove, or alignment pins) on the split interface.
+- **When to use:** Use this tool when a part exceeds the build volume of a 3D printer bed and needs to be partitioned into print-safe interlocking segments.
+- **Parameters:**
+  - `scad_path` (string): Path to the source `.scad` file.
+  - `part_name` (string, optional): Specific module name to split.
+  - `bed_width` (number, default 220.0): Printer bed limit in X (mm).
+  - `bed_depth` (number, default 220.0): Printer bed limit in Y (mm).
+  - `bed_height` (number, default 250.0): Printer build height in Z (mm).
+  - `safety_margin` (number, default 10.0): Margin subtracted from bed limits (mm).
+  - `split_axis` (string, default "auto"): Axis to split on ("x", "y", "z", or "auto").
+  - `joint_type` (string, default "auto"): Joining geometry ("dovetail", "flange", "tongue_groove", "pin", or "auto").
+  - `manual_coordinate` (number, optional): Coordinate value to split at (requires explicit `split_axis`).
+  - `joint_configs` (object, optional): Custom overrides for specific joints.
+  - `output_dir` (string, optional): Directory to save split STL segments and exploded SCAD/PNG previews.
 
 ## Environment Variables
 - `OPENSCAD_BINARY_PATH`: Path to the OpenSCAD command-line executable. Defaults to `/home/jules/.local/bin/openscad`.
 - `OPENSCAD_DEFAULT_TOLERANCE`: Default design tolerance (for clearances/fits). Defaults to `0.05`.
+

@@ -13,6 +13,8 @@ Available tools:
 - `generate_multiview(scad_path: str, output_path: str, img_size: int = 1024, colorscheme: str = "Sunset", views: list = None)`: Generates a single combined quadrant preview image containing front, side, top, and isometric views in one MCP call.
 - `check_interference(scad_path: str, fail_fast: bool = False, img_size: int = 512, colorscheme: str = "Sunset", output_path: str = None)`: Detects geometric collisions between parts, returning overlap volumes, bounding boxes, and an inline highlight image showing intersections in red.
 - `extract_bom(scad_path: str, output_dir: str = None, formats: list = None)`: Parses inline comment annotations and block metadata from the SCAD file to compile a structured, aggregated Bill of Materials (BOM) exported in JSON, Markdown, and CSV formats.
+- `nest_panels(scad_path: str, sheet_preset: str = "2x4", sheet_width: float = None, sheet_height: float = None, kerf: float = 3.175, parts: list = None, strategy: str = "optimized", output_dir: str = None)`: Nests 2D panel templates from an OpenSCAD model onto stock sheets to optimize material utilization.
+- `split_for_printing(scad_path: str, part_name: str = None, bed_width: float = 220.0, bed_depth: float = 220.0, bed_height: float = 250.0, safety_margin: float = 10.0, split_axis: str = "auto", joint_type: str = "auto", manual_coordinate: float = None, joint_configs: dict = None, output_dir: str = None)`: Splits an oversized 3D part into bed-sized segments with interlocking joint mechanisms (dovetail, flange, tongue_groove, pin).
 
 Always perform visual verification using `compile_and_preview` before finalizing the geometry to ensure correct manifold properties and alignments.
 
