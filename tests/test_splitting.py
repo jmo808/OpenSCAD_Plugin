@@ -236,3 +236,95 @@ def test_dovetail_clearance_difference(local_tmp_path):
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not available")
 
+def test_flange_scad_generation():
+    from splitting import generate_flange_scad
+    params = {
+        "flange_width": 20.0,
+        "flange_thickness": 5.0,
+        "screw_size": "M3",
+        "screw_count": 2,
+        "clearance": 0.2
+    }
+    male_scad, female_scad = generate_flange_scad(face_width=50.0, face_height=10.0, params=params)
+    assert isinstance(male_scad, str) and len(male_scad) > 0
+    assert isinstance(female_scad, str) and len(female_scad) > 0
+
+def test_flange_screw_configurability():
+    from splitting import generate_flange_scad
+    params_m2 = {
+        "flange_width": 15.0,
+        "flange_thickness": 4.0,
+        "screw_size": "M2",
+        "screw_count": 3,
+        "clearance": 0.1
+    }
+    params_m4 = {
+        "flange_width": 15.0,
+        "flange_thickness": 4.0,
+        "screw_size": "M4",
+        "screw_count": 3,
+        "clearance": 0.1
+    }
+    male_m2, female_m2 = generate_flange_scad(60.0, 12.0, params_m2)
+    male_m4, female_m4 = generate_flange_scad(60.0, 12.0, params_m4)
+    # The generated SCAD should be different for M2 vs M4 (e.g. cylinder radius)
+    assert male_m2 != male_m4
+    assert female_m2 != female_m4
+
+def test_flange_clearance_holes(local_tmp_path):
+    from splitting import generate_flange_scad
+    from stl_utils import compute_stl_volume
+    from scad_utils import run_openscad
+    
+    params_no_clearance = {
+        "flange_width": 20.0,
+        "flange_thickness": 5.0,
+        "screw_size": "M3",
+        "screw_count": 2,
+        "clearance": 0.0
+    }
+    params_clearance = {
+        "flange_width": 20.0,
+        "flange_thickness": 5.0,
+        "screw_size": "M3",
+        "screw_count": 2,
+        "clearance": 0.5
+    }
+    
+    _, female_no_clearance = generate_flange_scad(50.0, 10.0, params_no_clearance)
+    _, female_clearance = generate_flange_scad(50.0, 10.0, params_clearance)
+    
+    scad_content = f"""
+    module pocket_no_clearance() {{
+        {female_no_clearance}
+    }}
+    module pocket_clearance() {{
+        {female_clearance}
+    }}
+    part = "clearance";
+    if (part == "no_clearance") {{
+        pocket_no_clearance();
+    }} else {{
+        pocket_clearance();
+    }}
+    """
+    scad_path = os.path.join(local_tmp_path, "flange_clearance.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    stl_no_clearance = os.path.join(local_tmp_path, "no_clearance.stl")
+    stl_clearance = os.path.join(local_tmp_path, "clearance.stl")
+    
+    try:
+        run_openscad(["-D", "part=\"no_clearance\"", "-o", stl_no_clearance, scad_path])
+        run_openscad(["-D", "part=\"clearance\"", "-o", stl_clearance, scad_path])
+        
+        vol_no_clearance = compute_stl_volume(stl_no_clearance)
+        vol_clearance = compute_stl_volume(stl_clearance)
+        
+        # Pocket with clearance should be larger (wider holes/pockets)
+        assert vol_clearance > vol_no_clearance
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+
