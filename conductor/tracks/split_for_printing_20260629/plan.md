@@ -2,17 +2,17 @@
 
 ## Phase 1: Split Plane Calculation
 
-- [ ] Task: Write tests for bounding box extraction and split plane calculation
-    - [ ] Create test SCAD fixture with a known oversized part (e.g., 300×150×400mm box)
-    - [ ] Write test: extracts correct bounding box dimensions from a part via OpenSCAD CLI
-    - [ ] Write test: auto mode identifies Z as oversize axis for a 400mm tall part on 250mm bed
-    - [ ] Write test: auto mode computes correct split coordinate (midpoint) for single split
-    - [ ] Write test: auto mode computes multiple split coordinates for very large parts (3+ segments)
-    - [ ] Write test: auto mode identifies multiple oversize axes and splits each
-    - [ ] Write test: manual mode uses user-specified axis and coordinate
-    - [ ] Write test: safety margin (5mm) is subtracted from bed dimensions
-    - [ ] Write test: raises error if part already fits within bed (no split needed)
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [b07058f] Task: Write tests for bounding box extraction and split plane calculation
+    - [x] Create test SCAD fixture with a known oversized part (e.g., 300×150×400mm box)
+    - [x] Write test: extracts correct bounding box dimensions from a part via OpenSCAD CLI
+    - [x] Write test: auto mode identifies Z as oversize axis for a 400mm tall part on 250mm bed
+    - [x] Write test: auto mode computes correct split coordinate (midpoint) for single split
+    - [x] Write test: auto mode computes multiple split coordinates for very large parts (3+ segments)
+    - [x] Write test: auto mode identifies multiple oversize axes and splits each
+    - [x] Write test: manual mode uses user-specified axis and coordinate
+    - [x] Write test: safety margin (5mm) is subtracted from bed dimensions
+    - [x] Write test: raises error if part already fits within bed (no split needed)
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement split plane calculator
     - [ ] Create `splitting.py` module
