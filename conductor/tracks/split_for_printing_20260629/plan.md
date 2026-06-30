@@ -55,11 +55,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement flange joint with screw/nut pockets`
 
-- [ ] Task: Write tests for tongue-and-groove and pin joint generators
-    - [ ] Write test: tongue-and-groove produces matching ridge and slot geometry
-    - [ ] Write test: pin holes are correctly sized and positioned on both halves
-    - [ ] Write test: clearance applied correctly to both joint types
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [170572b] Task: Write tests for tongue-and-groove and pin joint generators
+    - [x] Write test: tongue-and-groove produces matching ridge and slot geometry
+    - [x] Write test: pin holes are correctly sized and positioned on both halves
+    - [x] Write test: clearance applied correctly to both joint types
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement tongue-and-groove and pin joint generators
     - [ ] Add `generate_tongue_groove_scad(face_width, face_height, params) -> tuple[str, str]`
