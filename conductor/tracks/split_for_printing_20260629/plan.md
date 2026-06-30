@@ -1,6 +1,6 @@
 # Implementation Plan: Part Splitting with Joining Mechanisms for 3D Printing
 
-## Phase 1: Split Plane Calculation
+## Phase 1: Split Plane Calculation [checkpoint: 28e1bda]
 
 - [x] [b07058f] Task: Write tests for bounding box extraction and split plane calculation
     - [x] Create test SCAD fixture with a known oversized part (e.g., 300×150×400mm box)
