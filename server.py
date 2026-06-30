@@ -28,7 +28,7 @@ OPENSCAD_DEFAULT_TOLERANCE = float(os.getenv("OPENSCAD_DEFAULT_TOLERANCE", "0.05
 
 
 @mcp.tool()
-def generate_scad(scad_code: str, output_path: str, parameters: dict = None) -> str:
+def generate_scad(scad_code: str, output_path: str, parameters: dict | None = None) -> str:
     """Writes or modifies an OpenSCAD (.scad) source code file, incorporating mechanical parameters.
 
     Args:
@@ -83,11 +83,11 @@ def generate_scad(scad_code: str, output_path: str, parameters: dict = None) -> 
 @mcp.tool()
 def compile_and_preview(
     scad_path: str,
-    output_dir: str = None,
+    output_dir: str | None = None,
     img_size: int = 512,
     projection: str = "ortho",
     colorscheme: str = "Sunset",
-    views: list = None
+    views: list | None = None
 ) -> list:
     """Compiles an OpenSCAD model and renders orthogonal or perspective views to preview PNGs.
     The rendered images are returned directly in the response payload.
@@ -216,7 +216,7 @@ def export_stl(scad_path: str, output_path: str) -> str:
 def export_2d_templates(
     scad_path: str,
     output_dir: str,
-    part_name: str = None,
+    part_name: str | None = None,
     format: str = "both"
 ) -> list:
     """Extracts individual panels from a 3D OpenSCAD assembly and exports them as flat 2D DXF/SVG vector files.
@@ -440,7 +440,7 @@ def generate_multiview(
     output_path: str,
     img_size: int = 1024,
     colorscheme: str = "Sunset",
-    views: list = None
+    views: list | None = None
 ) -> list:
     """Renders a single combined quadrant image containing front, side, top, and isometric views in one MCP call.
 
@@ -566,7 +566,7 @@ def check_interference(
     fail_fast: bool = False,
     img_size: int = 512,
     colorscheme: str = "Sunset",
-    output_path: str = None
+    output_path: str | None = None
 ) -> list:
     """Detects and reports geometric intersections (collisions) between components in an OpenSCAD assembly model.
 
@@ -639,8 +639,8 @@ def check_interference(
 @mcp.tool()
 def extract_bom(
     scad_path: str,
-    output_dir: str = None,
-    formats: list = None
+    output_dir: str | None = None,
+    formats: list | None = None
 ) -> list:
     """Parses tagged hardware annotations in an OpenSCAD source file and compiles a Bill of Materials.
     
@@ -705,12 +705,12 @@ def extract_bom(
 def nest_panels(
     scad_path: str,
     sheet_preset: str = "2x4",
-    sheet_width: float = None,
-    sheet_height: float = None,
+    sheet_width: float | None = None,
+    sheet_height: float | None = None,
     kerf: float = 3.175,
-    parts: list[str] = None,
+    parts: list[str] | None = None,
     strategy: str = "optimized",
-    output_dir: str = None
+    output_dir: str | None = None
 ) -> list:
     """Nests 2D panel templates from an OpenSCAD assembly model onto stock sheets.
 

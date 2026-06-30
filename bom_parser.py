@@ -214,7 +214,7 @@ def aggregate_bom(entries: list[dict]) -> dict:
                 
         aggregated[key]["qty"] += entry["qty"]
         
-    categories = {}
+    categories: dict[str, list[dict]] = {}
     total_quantity = 0
     total_unique_items = len(aggregated)
     
@@ -272,7 +272,7 @@ def export_bom_csv(aggregated: dict, output_path: str):
                 writer.writerow([cat, item["name"], item["qty"], sup, pnum])
 
 
-def export_bom(aggregated: dict, output_dir: str = None, formats: list = None) -> dict[str, str]:
+def export_bom(aggregated: dict, output_dir: str | None = None, formats: list | None = None) -> dict[str, str]:
     """Unified exporter to write BOM in multiple formats to output_dir.
     
     Returns:

@@ -8,7 +8,7 @@ from scad_utils import (
     get_dxf_bbox
 )
 
-def extract_panel_dimensions(scad_path: str, parts: list[str] = None) -> list[dict]:
+def extract_panel_dimensions(scad_path: str, parts: list[str] | None = None) -> list[dict]:
     """Extracts panel dimensions (width_mm, height_mm) from the OpenSCAD assembly file.
     
     Using the part selector pattern, each discovered/specified part is exported 
@@ -184,7 +184,7 @@ def pack_ffd(panels: list[dict], sheet_w: float, sheet_h: float, kerf: float) ->
     # Sort panels by area descending
     sorted_panels = sorted(panels, key=lambda p: p["width_mm"] * p["height_mm"], reverse=True)
     
-    sheets = []
+    sheets: list[dict] = []
     
     for panel in sorted_panels:
         w = panel["width_mm"]
