@@ -473,5 +473,70 @@ def test_pin_clearance(local_tmp_path):
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not available")
 
+def test_split_part_basic(local_tmp_path, oversized_scad_file):
+    from splitting import split_part
+    
+    split_planes = [{"axis": "z", "coordinate": 200.0}]
+    try:
+        segments = split_part(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes,
+            joint_configs=None,
+            output_dir=local_tmp_path
+        )
+        
+        assert len(segments) == 2
+        assert segments[0]["name"] == "oversized_box_part_1"
+        assert segments[1]["name"] == "oversized_box_part_2"
+        
+        stl_1 = segments[0]["stl_path"]
+        stl_2 = segments[1]["stl_path"]
+        assert os.path.exists(stl_1)
+        assert os.path.exists(stl_2)
+        
+        from stl_utils import compute_stl_volume
+        assert compute_stl_volume(stl_1) > 0
+        assert compute_stl_volume(stl_2) > 0
+        
+        # Z-split should auto select flange
+        assert segments[0]["joint_type"] == "flange"
+        
+        # Dimensions check
+        assert "dimensions_mm" in segments[0]
+        assert "fits_bed" in segments[0]
+        
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_split_part_override_joint(local_tmp_path, oversized_scad_file):
+    from splitting import split_part
+    
+    split_planes = [{"axis": "z", "coordinate": 200.0}]
+    joint_configs = {
+        "z": {
+            "joint_type": "dovetail",
+            "finger_count": 2,
+            "finger_width": 10,
+            "finger_depth": 5,
+            "taper_angle": 20,
+            "clearance": 0.2
+        }
+    }
+    
+    try:
+        segments = split_part(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes,
+            joint_configs=joint_configs,
+            output_dir=local_tmp_path
+        )
+        assert len(segments) == 2
+        assert segments[0]["joint_type"] == "dovetail"
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+
 
 
