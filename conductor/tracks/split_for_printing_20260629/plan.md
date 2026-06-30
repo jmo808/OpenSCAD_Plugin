@@ -26,12 +26,12 @@
 
 ## Phase 2: Joining Mechanism Generators
 
-- [ ] Task: Write tests for dovetail joint generator
-    - [ ] Write test: generates valid OpenSCAD code for dovetail fingers on a flat face
-    - [ ] Write test: male and female halves interlock (intersection volume > 0 when mated)
-    - [ ] Write test: clearance parameter widens female slots correctly
-    - [ ] Write test: finger count and dimensions are configurable
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [0b863d1] Task: Write tests for dovetail joint generator
+    - [x] Write test: generates valid OpenSCAD code for dovetail fingers on a flat face
+    - [x] Write test: male and female halves interlock (intersection volume > 0 when mated)
+    - [x] Write test: clearance parameter widens female slots correctly
+    - [x] Write test: finger count and dimensions are configurable
+    - [x] Run tests and confirm they all fail (Red phase)
 
 - [ ] Task: Implement dovetail joint generator
     - [ ] Add `generate_dovetail_scad(face_width, face_height, params) -> tuple[str, str]` to `splitting.py`
