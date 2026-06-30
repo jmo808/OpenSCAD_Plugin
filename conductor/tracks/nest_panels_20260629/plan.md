@@ -60,14 +60,14 @@
 
 ## Phase 3: Visual Layout Rendering
 
-- [~] Task: Write tests for layout PNG generation
-    - [ ] Write test: generates a PNG file for a valid nesting layout
-    - [ ] Write test: PNG contains labeled rectangles (verify file is non-empty and correct size)
-    - [ ] Write test: returns inline base64 image data
-    - [ ] Write test: generates separate PNGs for multi-sheet layouts
-    - [ ] Run tests and confirm they all fail (Red phase)
+- [x] [7f88b88] Task: Write tests for layout PNG generation
+    - [x] Write test: generates a PNG file for a valid nesting layout
+    - [x] Write test: PNG contains labeled rectangles (verify file is non-empty and correct size)
+    - [x] Write test: returns inline base64 image data
+    - [x] Write test: generates separate PNGs for multi-sheet layouts
+    - [x] Run tests and confirm they all fail (Red phase)
 
-- [ ] Task: Implement layout PNG rendering
+- [~] Task: Implement layout PNG rendering
     - [ ] Add `render_layout_png(sheet: dict, output_path: str, img_size: int) -> bytes` to `nesting.py`
     - [ ] Use Pillow (PIL) to draw sheet outline, panel rectangles, kerf gaps, and text labels
     - [ ] Scale drawing to fit `img_size` while preserving aspect ratio
