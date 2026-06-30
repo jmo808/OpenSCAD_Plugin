@@ -67,7 +67,7 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(splitting): Implement tongue-groove and pin joint generators`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Joining Mechanism Generators' (Protocol in workflow.md)
 
 ## Phase 3: Part Splitting Engine & STL Export
 
