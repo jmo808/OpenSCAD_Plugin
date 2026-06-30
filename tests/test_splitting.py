@@ -113,3 +113,121 @@ def test_raises_error_if_fits():
     }
     with pytest.raises(ValueError, match="Part already fits within printer bed"):
         calculate_split_planes(bbox, bed_x=220, bed_y=220, bed_z=250, margin=5)
+
+def test_dovetail_scad_generation():
+    from splitting import generate_dovetail_scad
+    params = {
+        "finger_count": 2,
+        "finger_width": 10.0,
+        "finger_depth": 5.0,
+        "taper_angle": 20.0,
+        "clearance": 0.2
+    }
+    male_scad, female_scad = generate_dovetail_scad(face_width=50.0, face_height=10.0, params=params)
+    assert isinstance(male_scad, str) and len(male_scad) > 0
+    assert isinstance(female_scad, str) and len(female_scad) > 0
+
+def test_dovetail_interlock_and_clearance(local_tmp_path):
+    from splitting import generate_dovetail_scad
+    from stl_utils import compute_stl_volume
+    from scad_utils import run_openscad
+    
+    # 1. Test interlock (intersection volume > 0 when mated)
+    params_no_clearance = {
+        "finger_count": 2,
+        "finger_width": 10.0,
+        "finger_depth": 5.0,
+        "taper_angle": 20.0,
+        "clearance": 0.0
+    }
+    male_scad, female_scad = generate_dovetail_scad(
+        face_width=50.0, face_height=10.0, params=params_no_clearance
+    )
+    
+    # Write a SCAD file to compute intersection
+    scad_content = f"""
+    module male() {{
+        {male_scad}
+    }}
+    module female() {{
+        {female_scad}
+    }}
+    intersection() {{
+        male();
+        female();
+    }}
+    """
+    scad_path = os.path.join(local_tmp_path, "dovetail_test.scad")
+    stl_path = os.path.join(local_tmp_path, "dovetail_test.stl")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    try:
+        run_openscad(["-o", stl_path, scad_path])
+        vol = compute_stl_volume(stl_path)
+        assert vol > 0.0
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_dovetail_clearance_difference(local_tmp_path):
+    from splitting import generate_dovetail_scad
+    from stl_utils import compute_stl_volume
+    from scad_utils import run_openscad
+    
+    # Compare volume of female pocket with and without clearance
+    params_no_clearance = {
+        "finger_count": 2,
+        "finger_width": 10.0,
+        "finger_depth": 5.0,
+        "taper_angle": 20.0,
+        "clearance": 0.0
+    }
+    params_clearance = {
+        "finger_count": 2,
+        "finger_width": 10.0,
+        "finger_depth": 5.0,
+        "taper_angle": 20.0,
+        "clearance": 0.2
+    }
+    
+    _, female_no_clearance = generate_dovetail_scad(
+        face_width=50.0, face_height=10.0, params=params_no_clearance
+    )
+    _, female_clearance = generate_dovetail_scad(
+        face_width=50.0, face_height=10.0, params=params_clearance
+    )
+    
+    scad_content = f"""
+    module pocket_no_clearance() {{
+        {female_no_clearance}
+    }}
+    module pocket_clearance() {{
+        {female_clearance}
+    }}
+    // Render them separately using part selection
+    part = "clearance";
+    if (part == "no_clearance") {{
+        pocket_no_clearance();
+    }} else {{
+        pocket_clearance();
+    }}
+    """
+    scad_path = os.path.join(local_tmp_path, "clearance_test.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    stl_no_clearance = os.path.join(local_tmp_path, "no_clearance.stl")
+    stl_clearance = os.path.join(local_tmp_path, "clearance.stl")
+    
+    try:
+        run_openscad(["-D", "part=\"no_clearance\"", "-o", stl_no_clearance, scad_path])
+        run_openscad(["-D", "part=\"clearance\"", "-o", stl_clearance, scad_path])
+        
+        vol_no_clearance = compute_stl_volume(stl_no_clearance)
+        vol_clearance = compute_stl_volume(stl_clearance)
+        
+        # Female pocket with clearance should be larger (wider slots)
+        assert vol_clearance > vol_no_clearance
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
