@@ -78,8 +78,8 @@
 
 - [x] [8048d33] Task: Conductor - User Manual Verification 'Phase 3: Visual Layout Rendering' (Protocol in workflow.md)
 
-## Phase 4: MCP Tool Integration & Documentation
-
+## Phase 4: MCP Tool Integration & Documentation [checkpoint: 63a8a02]
+ 
 - [x] [3648261] Task: Write tests for `nest_panels` MCP tool
     - [x] Write test: tool is registered and appears in MCP schema
     - [x] Write test: returns structured JSON matching the schema for a valid SCAD file
@@ -89,7 +89,7 @@
     - [x] Write test: `strategy="optimized"` uses FFD algorithm
     - [x] Write test: custom `sheet_width` and `sheet_height` override preset
     - [x] Run tests and confirm they all fail (Red phase)
-
+ 
 - [x] [52a1110] Task: Implement `nest_panels` MCP tool
     - [x] Add `@mcp.tool()` decorated `nest_panels` function to `server.py`
     - [x] Wire up panel extraction, packing algorithm selection, and layout rendering
@@ -97,17 +97,17 @@
     - [x] Support preset overrides and custom output directory
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement nest_panels MCP tool`
-
+ 
 - [x] [5e517b0] Task: Update documentation and installer
     - [x] Update `instructions.md` with `nest_panels` tool documentation
     - [x] Update `skills/openscad-mcp/SKILL.md` to include new tool description
     - [x] Run `install.py` to verify schema exports correctly
     - [x] Commit: `docs(plugin): Add nest_panels to instructions and skill`
-
+ 
 - [x] [c0c187e] Task: Final coverage verification
     - [x] Run `pytest --cov=. --cov-report=term` and verify >80% coverage
     - [x] Fix any coverage gaps with targeted tests
     - [x] Run full test suite one final time
     - [x] Commit: `test(coverage): Ensure >80% coverage for nesting module`
-
-- [~] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
+ 
+- [x] [63a8a02] Task: Conductor - User Manual Verification 'Phase 4: MCP Tool Integration & Documentation' (Protocol in workflow.md)
