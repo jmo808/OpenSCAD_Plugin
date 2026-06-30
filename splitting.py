@@ -123,3 +123,61 @@ def validate_manual_split(bbox: dict, axis: str, coord: float) -> dict:
         "axis": axis,
         "coordinate": float(coord)
     }
+
+def generate_dovetail_scad(
+    face_width: float,
+    face_height: float,
+    params: dict | None = None
+) -> tuple[str, str]:
+    """Generates OpenSCAD code for interlocking dovetail joint fingers.
+
+    Args:
+        face_width: Width of the cut interface face (mm).
+        face_height: Height of the cut interface face (mm).
+        params: Dictionary of joint parameters:
+          {finger_count, finger_width, finger_depth, taper_angle, clearance}.
+
+    Returns:
+        A tuple of (male_scad, female_scad) strings.
+    """
+    if params is None:
+        params = {}
+    finger_count = params.get("finger_count", 2)
+    finger_width = params.get("finger_width", 10.0)
+    finger_depth = params.get("finger_depth", 5.0)
+    taper_angle = params.get("taper_angle", 20.0)
+    clearance = params.get("clearance", 0.2)
+    
+    angle_rad = math.radians(taper_angle)
+    w_base = finger_width
+    w_tip = finger_width + 2 * finger_depth * math.tan(angle_rad)
+    
+    points_male = f"[[-{w_base}/2, 0], [{w_base}/2, 0], [{w_tip}/2, {finger_depth}], [-{w_tip}/2, {finger_depth}]]"
+    points_female = f"[[-{w_base}/2, -0.1], [{w_base}/2, -0.1], [{w_tip}/2, {finger_depth}], [-{w_tip}/2, {finger_depth}]]"
+    
+    translates_male = []
+    translates_female = []
+    
+    for i in range(finger_count):
+        x_pos = -face_width / 2.0 + (i + 0.5) * (face_width / finger_count)
+        
+        # Male finger
+        translates_male.append(
+            f"translate([{x_pos:.4f}, 0, 0]) rotate([90, 0, 0]) "
+            f"linear_extrude(height={face_height:.4f}, center=true) "
+            f"polygon(points={points_male});"
+        )
+        
+        # Female pocket (with clearance)
+        # Note: height is extended slightly so it cuts completely through extrusion boundaries
+        translates_female.append(
+            f"translate([{x_pos:.4f}, 0, 0]) rotate([90, 0, 0]) "
+            f"linear_extrude(height={face_height + clearance*2 + 0.2:.4f}, center=true) "
+            f"offset(delta={clearance}) "
+            f"polygon(points={points_female});"
+        )
+        
+    male_scad = "union() {\n    " + "\n    ".join(translates_male) + "\n}"
+    female_scad = "union() {\n    " + "\n    ".join(translates_female) + "\n}"
+    
+    return male_scad, female_scad

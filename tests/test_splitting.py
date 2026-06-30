@@ -126,6 +126,11 @@ def test_dovetail_scad_generation():
     male_scad, female_scad = generate_dovetail_scad(face_width=50.0, face_height=10.0, params=params)
     assert isinstance(male_scad, str) and len(male_scad) > 0
     assert isinstance(female_scad, str) and len(female_scad) > 0
+    
+    # Test with params=None to ensure default params are used
+    male_scad_def, female_scad_def = generate_dovetail_scad(face_width=50.0, face_height=10.0)
+    assert isinstance(male_scad_def, str) and len(male_scad_def) > 0
+    assert isinstance(female_scad_def, str) and len(female_scad_def) > 0
 
 def test_dovetail_interlock_and_clearance(local_tmp_path):
     from splitting import generate_dovetail_scad
