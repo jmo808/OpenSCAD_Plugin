@@ -21,7 +21,7 @@
 
 - [x] [67292da] Task: Conductor - User Manual Verification 'Phase 1: Panel Dimension Extraction' (Protocol in workflow.md)
 
-## Phase 2: Packing Algorithms
+## Phase 2: Packing Algorithms [checkpoint: 4a0c32a]
 
 - [x] [68ec82e] Task: Write tests for shelf packing algorithm (simple)
     - [x] Write test: packs 3 rectangles onto a sheet without overlap
@@ -56,11 +56,11 @@
     - [x] Run tests and confirm they all pass (Green phase)
     - [x] Commit: `feat(nesting): Implement FFD (optimized) packing algorithm`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Packing Algorithms' (Protocol in workflow.md)
+- [x] [4a0c32a] Task: Conductor - User Manual Verification 'Phase 2: Packing Algorithms' (Protocol in workflow.md)
 
 ## Phase 3: Visual Layout Rendering
 
-- [ ] Task: Write tests for layout PNG generation
+- [~] Task: Write tests for layout PNG generation
     - [ ] Write test: generates a PNG file for a valid nesting layout
     - [ ] Write test: PNG contains labeled rectangles (verify file is non-empty and correct size)
     - [ ] Write test: returns inline base64 image data
