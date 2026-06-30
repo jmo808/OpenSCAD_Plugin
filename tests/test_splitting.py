@@ -655,6 +655,48 @@ def test_generate_exploded_scad(local_tmp_path, oversized_scad_file):
     except FileNotFoundError:
         pytest.skip("OpenSCAD binary not available")
 
+def test_generate_exploded_scad_all_axes(local_tmp_path, oversized_scad_file):
+    from splitting import generate_exploded_scad
+    
+    split_planes = [
+        {"axis": "x", "coordinate": 150.0},
+        {"axis": "y", "coordinate": 75.0},
+        {"axis": "z", "coordinate": 200.0}
+    ]
+    try:
+        scad_code = generate_exploded_scad(
+            scad_path=oversized_scad_file,
+            part_name="oversized_box",
+            split_planes=split_planes,
+            offset=15.0
+        )
+        assert isinstance(scad_code, str)
+        assert "translate" in scad_code
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+def test_generate_exploded_scad_no_part_name(local_tmp_path):
+    import os
+    from splitting import generate_exploded_scad
+    
+    scad_content = "cube([100, 100, 100]);"
+    scad_path = os.path.join(local_tmp_path, "raw_model.scad")
+    with open(scad_path, "w") as f:
+        f.write(scad_content)
+        
+    split_planes = [{"axis": "z", "coordinate": 50.0}]
+    try:
+        scad_code = generate_exploded_scad(
+            scad_path=scad_path,
+            part_name=None,
+            split_planes=split_planes
+        )
+        assert isinstance(scad_code, str)
+        assert "include" in scad_code
+    except FileNotFoundError:
+        pytest.skip("OpenSCAD binary not available")
+
+
 
 
 
