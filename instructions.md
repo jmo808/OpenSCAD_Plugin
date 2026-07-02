@@ -4,6 +4,8 @@ This MCP server provides advanced 3D modeling, rendering, and export capabilitie
 
 ## Available Tools
 
+**CRITICAL BEHAVIORAL RULE**: Do NOT automatically generate or export STL, DXF, or SVG files after every edit. Export functionality (`export_stl`, `export_2d_templates`) is on-demand only and must only be used when the user explicitly requests it.
+
 ### 1. `generate_scad`
 Writes or modifies an OpenSCAD `.scad` source code file, allowing parameter injection.
 - **When to use:** Use this tool to write the initial geometry of a model or update variables/parameters (e.g. clearance tolerances, length, width).

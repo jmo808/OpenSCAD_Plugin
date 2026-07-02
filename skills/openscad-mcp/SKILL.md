@@ -18,4 +18,6 @@ Available tools:
 
 Always perform visual verification using `compile_and_preview` before finalizing the geometry to ensure correct manifold properties and alignments.
 
+CRITICAL: Do NOT automatically generate or export STL, DXF, or SVG files after every edit. Only use `export_stl` and `export_2d_templates` when the user explicitly requests them. Export functionality is on-demand only.
+
 User request: {{args}}
