@@ -1,8 +1,13 @@
 [project]
 name = "openscad-mcp"
 version = "0.1.0"
-description = "MCP server for OpenSCAD 3D modeling and rendering"
+description = "Advanced MCP server empowering AI agents with OpenSCAD 3D modeling, interference checking, and DXF/STL exporting capabilities."
 readme = "README.md"
+authors = [
+  { name = "Jules", email = "jules@example.com" }
+]
+keywords = ["mcp", "openscad", "cad", "ai", "3d-printing"]
+urls = { Repository = "https://github.com/jmo808/OpenSCAD_Plugin" }
 requires-python = ">=3.12"
 dependencies = [
     "mcp>=1.27.2",
